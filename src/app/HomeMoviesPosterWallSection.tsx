@@ -21,6 +21,7 @@ export default async function HomeMoviesPosterWallSection() {
       title="电影海报墙 / Films"
       subtitle="我喜欢的 9 部电影（hover 看信息，点击看详情）。"
       titleHref="/movies"
+      sectionClassName="mt-0"
     />
   );
 }

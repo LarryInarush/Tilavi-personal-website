@@ -39,6 +39,8 @@ type Props = {
    * - 不传则展示为纯标题（不可点击）
    */
   titleHref?: string;
+  /** 外层 `<section>` 的 class（首页通栏时可去掉默认 `mt-12`）。 */
+  sectionClassName?: string;
 };
 
 function clamp(n: number, min: number, max: number) {
@@ -50,6 +52,7 @@ export default function MoviePosterWallClient({
   title,
   subtitle,
   titleHref,
+  sectionClassName,
 }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -89,7 +92,7 @@ export default function MoviePosterWallClient({
   } as const;
 
   return (
-    <section className="mt-12">
+    <section className={sectionClassName ?? "mt-12"}>
       <div className="flex items-end justify-between gap-4">
         <div className="min-w-0">
           {titleHref ? (
@@ -202,67 +205,176 @@ export default function MoviePosterWallClient({
 
             {/* 卡片 */}
             <motion.div
-              className="relative z-10 w-full max-w-2xl overflow-hidden rounded-3xl border border-white/12 bg-[linear-gradient(180deg,rgba(5,6,8,0.92),rgba(5,6,8,0.72))] shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur"
+              className="relative z-10 w-full max-w-3xl max-h-[min(88vh,920px)] overflow-hidden rounded-3xl border border-white/12 bg-[linear-gradient(180deg,rgba(5,6,8,0.92),rgba(5,6,8,0.72))] shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur"
               initial={{ y: 22, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 22, opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="grid gap-6 p-6 sm:grid-cols-[220px_1fr]">
-                <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+              <div className="grid max-h-[min(88vh,920px)] gap-0 sm:grid-cols-[200px_1fr]">
+                <div className="hidden overflow-hidden border-b border-white/10 bg-black/20 sm:block sm:border-b-0 sm:border-r">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={activeMovie.posterSrc}
                     alt={`${activeMovie.titleZh} poster`}
-                    className="h-full w-full object-cover"
+                    className="h-full max-h-[min(88vh,920px)] w-full object-cover sm:min-h-[320px]"
                   />
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-xl font-semibold text-zinc-50">
-                        {activeMovie.titleZh}
-                      </h3>
-                      <p className="mt-1 text-sm text-zinc-300">
-                        {activeMovie.titleEn} · {activeMovie.year}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveId(null)}
-                      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-zinc-100 transition hover:border-white/18 hover:bg-white/10"
-                    >
-                      关闭 / Close
-                    </button>
+                <div className="flex min-h-0 min-w-0 flex-col">
+                  <div className="shrink-0 border-b border-white/10 p-5 sm:hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={activeMovie.posterSrc}
+                      alt={`${activeMovie.titleZh} poster`}
+                      className="mx-auto max-h-48 rounded-xl object-contain"
+                    />
                   </div>
 
-                  <div className="mt-4 space-y-3">
-                    <div>
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <h3 className="text-xl font-semibold text-zinc-50">
+                          {activeMovie.titleZh}
+                        </h3>
+                        <p className="mt-1 text-sm text-zinc-300">
+                          {activeMovie.titleEn} · {activeMovie.year}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveId(null)}
+                        className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-zinc-100 transition hover:border-white/18 hover:bg-white/10"
+                      >
+                        关闭 / Close
+                      </button>
+                    </div>
+
+                    {/* TMDB / 本地 元信息 */}
+                    <dl className="mt-4 grid gap-2 text-sm text-zinc-300 sm:grid-cols-2">
+                      {activeMovie.directors?.length ? (
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-[#39ff14]/85">
+                            导演 / Director
+                          </dt>
+                          <dd className="mt-0.5 text-zinc-200">
+                            {activeMovie.directors.join(" · ")}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {activeMovie.tmdbRuntimeMin != null ? (
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                            片长
+                          </dt>
+                          <dd className="text-zinc-200">
+                            {activeMovie.tmdbRuntimeMin} min
+                          </dd>
+                        </div>
+                      ) : null}
+                      {activeMovie.tmdbReleaseDate ? (
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                            上映
+                          </dt>
+                          <dd className="text-zinc-200">
+                            {activeMovie.tmdbReleaseDate}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {activeMovie.tmdbVoteAverage != null ? (
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                            TMDB 评分
+                          </dt>
+                          <dd className="text-zinc-200">
+                            {activeMovie.tmdbVoteAverage.toFixed(1)}
+                            {activeMovie.tmdbVoteCount != null
+                              ? ` · ${activeMovie.tmdbVoteCount} votes`
+                              : ""}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {activeMovie.tmdbOriginalLanguage ? (
+                        <div>
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                            原始语言
+                          </dt>
+                          <dd className="text-zinc-200">
+                            {activeMovie.tmdbOriginalLanguage.toUpperCase()}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {activeMovie.tmdbProductionCountries?.length ? (
+                        <div className="sm:col-span-2">
+                          <dt className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                            制片国家/地区
+                          </dt>
+                          <dd className="text-zinc-200">
+                            {activeMovie.tmdbProductionCountries.join(" · ")}
+                          </dd>
+                        </div>
+                      ) : null}
+                    </dl>
+
+                    <div className="mt-5">
                       <div className="text-xs font-semibold uppercase tracking-widest text-[#39ff14]/90">
                         Tagline
                       </div>
                       <div className="mt-1 text-sm text-zinc-200">
-                        {activeMovie.taglineZh}
-                        <span className="block text-xs text-zinc-300">
-                          {activeMovie.taglineEn}
+                        {activeMovie.tmdbTaglineZh ?? activeMovie.taglineZh}
+                        <span className="mt-1 block text-xs text-zinc-400">
+                          {activeMovie.tmdbTaglineEn ?? activeMovie.taglineEn}
                         </span>
                       </div>
                     </div>
 
-                    <div>
+                    <div className="mt-5">
                       <div className="text-xs font-semibold uppercase tracking-widest text-[#00ffff]/80">
-                        Notes
+                        影片简介 / Overview
                       </div>
-                      <div className="mt-1 text-sm leading-7 text-zinc-200">
-                        {activeMovie.notesZh}
-                        <span className="mt-2 block text-xs leading-6 text-zinc-300">
-                          {activeMovie.notesEn}
-                        </span>
+                      <div className="mt-2 space-y-3 text-sm leading-relaxed text-zinc-200">
+                        <p>
+                          {activeMovie.tmdbOverviewZh ?? activeMovie.notesZh}
+                        </p>
+                        <p className="text-xs leading-relaxed text-zinc-400">
+                          {activeMovie.tmdbOverviewEn ?? activeMovie.notesEn}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    {activeMovie.castTop?.length ? (
+                      <div className="mt-5">
+                        <div className="text-xs font-semibold uppercase tracking-widest text-[#bf00ff]/85">
+                          主要演员 / Cast
+                        </div>
+                        <ul className="mt-2 space-y-1.5 text-sm text-zinc-300">
+                          {activeMovie.castTop.map((c) => (
+                            <li key={`${c.name}-${c.character}`}>
+                              <span className="text-zinc-100">{c.name}</span>
+                              <span className="text-zinc-500"> — </span>
+                              <span className="text-zinc-400">{c.character}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {activeMovie.tmdbOverviewZh ? (
+                      <div className="mt-5">
+                        <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                          本地笔记 / Personal notes
+                        </div>
+                        <div className="mt-2 text-sm leading-relaxed text-zinc-300">
+                          <p>{activeMovie.notesZh}</p>
+                          <p className="mt-2 text-xs text-zinc-500">
+                            {activeMovie.notesEn}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-5 flex flex-wrap gap-2">
                       {activeMovie.genres.map((g) => (
                         <span
                           key={g}

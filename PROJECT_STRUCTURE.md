@@ -4,7 +4,7 @@
 
 ## 1. 项目目标（你当前实现了什么）
 
-- 个人主页（`/`）：自我介绍 + 兴趣板块入口 + 最新文章（读取本地 Markdown）。
+- 个人主页（`/`）：自我介绍 + 电影通栏 + 摄影横向陈列（视口全宽、中间三张清晰）+ 兴趣板块 + 最新文章（读取本地 Markdown）。
 - 文章系统：
   - 文章列表页（`/posts`）
   - 文章详情页（`/posts/[slug]`）
@@ -34,13 +34,15 @@ site/
       *.md                      # 你的文章内容（frontmatter + Markdown 正文）
   src/
     app/
-      layout.tsx                # 根布局：HTML/Body 包裹 + 全局 metadata
+      layout.tsx                # 根布局：HTML/Body + Geist / Cormorant（`--font-photo-display`，摄影标题）
       globals.css              # Tailwind 入口 + 少量全局变量
       not-found.tsx            # 404 页面（Next.js App Router）
       page.tsx                 # 路由入口 `/`（极薄）
       HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名）
       HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；承载品牌/双语介绍）
       HomeMoviesPosterWallSection.tsx # 首页电影海报墙栏目（9 张预览，标题跳转 `/movies`）
+      HomePhotographySection.tsx      # 首页摄影作品栏目（占位图来自电影海报，数据源见 `lib/photography.ts`）
+      PhotographyCarouselClient.tsx   # 摄影横向轮播：全宽通栏、约 4× 行高、中间三张清晰/仅最外侧模糊、箭头、全屏（layoutId）、标题滚动入场
       TheTilaviSiteHeader.tsx # 站点 Header（叠加在 Hero 上的极简导航层）
       TheTilaviLogoMark.tsx   # TheTilavi Logo SVG mark（霓虹/酸性风格）
       posts/
@@ -56,7 +58,8 @@ site/
         MoviesBackgroundBackdrop.tsx # `/movies` 背景氛围层：服务端随机海报融入暗黑霓虹底色（避免 hydration mismatch）
     lib/
       posts.ts                 # 数据层：读取 content/posts/*.md 并解析
-      movies.ts                # 电影数据层：电影列表 + 分页
+      movies.ts                # 电影数据层：列表 + 分页；可选 TMDB 拉取海报与 credits/简介等
+      photography.ts           # 摄影数据层：当前复用电影海报 URL 作占位，便于日后替换真实作品
   public/
     *.svg / *.ico             # 静态资源（图标等）
     movies/
@@ -109,6 +112,7 @@ tags: ["摄影", "滑板"]  # tags 可选
 ## 7. 你接下来该改哪里（最常用）
 
 - 改主页文案/布局：`src/app/HomeLandingRoute.tsx`
+- 改摄影条样式/动效：`src/app/PhotographyCarouselClient.tsx`；摄影数据：`src/lib/photography.ts`
 - 新增文章：新增 `content/posts/*.md` 文件
 - 改文章列表页文案：`src/app/posts/PostsIndexRoute.tsx`
 - 改文章详情页样式/渲染区域：`src/app/posts/[slug]/PostDetailsRoute.tsx`

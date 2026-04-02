@@ -9,6 +9,7 @@
  *
  * 数据来源：
  * - 调用 `getAllPosts()`（来自 `src/lib/posts.ts`）读取 `content/posts/*.md` 的元数据。
+ * - 电影与摄影占位图：`getMoviesCatalog()` / `getPhotographyItems()`（见 `src/lib/movies.ts`、`photography.ts`）。
  *
  * 注意：
  * - 你随时可以改这里的文案、布局、最新文章数量等。
@@ -19,6 +20,7 @@ import { getAllPosts } from "@/lib/posts";
 import HomeHeroLanding from "./HomeHeroLanding";
 import TheTilaviSiteHeader from "./TheTilaviSiteHeader";
 import HomeMoviesPosterWallSection from "./HomeMoviesPosterWallSection";
+import HomePhotographySection from "./HomePhotographySection";
 
 /**
  * Personal home page content (route component).
@@ -37,7 +39,7 @@ export default async function HomeLandingRoute() {
   const latest = posts.slice(0, 3);
 
   return (
-    <div className="min-h-screen font-sans text-zinc-100">
+    <div className="min-h-screen overflow-x-hidden font-sans text-zinc-100">
       {/* 顶部舞台：Header 叠在 Hero 上，共享背景（更“艺术性”的首屏合成） */}
       <div className="relative">
         <HomeHeroLanding />
@@ -48,139 +50,152 @@ export default async function HomeLandingRoute() {
         </div>
       </div>
 
-      {/* 页面主体：控制最大宽度，保证桌面端观感舒服。 */}
-      <main className="mx-auto w-full max-w-4xl px-6 py-12">
-        {/* 个人简介卡片：你可以长期维护并随时扩展文案。 */}
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.25)] backdrop-blur">
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">
-            你好，我是你
-          </h1>
-          <p className="mt-3 max-w-2xl text-zinc-200">
-            这里记录我在摄影、滑板和生活里的有意思瞬间：构图练习、器材心得、动作复盘，以及一些随笔小想法。
-          </p>
+      {/* 页面主体：窄栏与通栏穿插，避免整页同一 max-width 显得呆板。 */}
+      <main className="w-full py-12">
+        {/* 个人简介：保持阅读舒适的窄栏 */}
+        <div className="mx-auto w-full max-w-3xl px-6">
+          <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.25)] backdrop-blur">
+            <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">
+              你好，我是你
+            </h1>
+            <p className="mt-3 max-w-2xl text-zinc-200">
+              这里记录我在摄影、滑板和生活里的有意思瞬间：构图练习、器材心得、动作复盘，以及一些随笔小想法。
+            </p>
 
-          {/* 两个入口：最新文章 + 兴趣板块锚点 */}
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/posts"
-              className="rounded-xl bg-[#39ff14] px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-[#2ee80e]"
-            >
-              查看最新文章
-            </Link>
-            <a
-              href="#interests"
-              className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
-            >
-              兴趣与内容
-            </a>
-          </div>
-        </section>
-
-        {/* 电影栏目：9 张海报预览（标题可进入完整电影页） */}
-        <HomeMoviesPosterWallSection />
-
-        {/* 兴趣板块：用来承接“后续持续扩展”。目前没有做分类筛选，只是内容入口。 */}
-        <section id="interests" className="mt-10">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-zinc-50">
-                兴趣板块
-              </h2>
-              <p className="mt-2 text-sm text-zinc-300">
-                你可以用文章持续扩展这些方向。
-              </p>
+            {/* 两个入口：最新文章 + 兴趣板块锚点 */}
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/posts"
+                className="rounded-xl bg-[#39ff14] px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-[#2ee80e]"
+              >
+                查看最新文章
+              </Link>
+              <a
+                href="#interests"
+                className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
+              >
+                兴趣与内容
+              </a>
             </div>
-          </div>
+          </section>
+        </div>
 
-          {/* 用 grid 做两列卡片；小屏自动堆叠。 */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
-              <h3 className="text-lg font-semibold text-zinc-50">
-                摄影
-              </h3>
-              <p className="mt-2 text-sm text-zinc-300">
-                构图、光线、后期与器材小结。
-              </p>
-              <div className="mt-4 text-sm">
-                <Link
-                  href="/posts"
-                  className="font-medium text-[#39ff14] hover:underline"
-                >
-                  从文章开始 →
-                </Link>
+        {/* 电影海报墙：通栏更宽，让画面有呼吸感 */}
+        <div className="mt-14 w-full border-y border-white/[0.06] bg-[radial-gradient(1200px_400px_at_50%_0%,rgba(57,255,20,0.06),transparent_55%)] py-12">
+          <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
+            <HomeMoviesPosterWallSection />
+          </div>
+        </div>
+
+        {/* 摄影作品：相对视口全宽通栏（突破父级宽度限制） */}
+        <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-x-hidden py-10">
+          <HomePhotographySection />
+        </div>
+
+        {/* 兴趣板块 + 文章：回到窄栏 */}
+        <div className="mx-auto mt-6 w-full max-w-3xl px-6">
+          <section id="interests" className="mt-10">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-zinc-50">
+                  兴趣板块
+                </h2>
+                <p className="mt-2 text-sm text-zinc-300">
+                  你可以用文章持续扩展这些方向。
+                </p>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
-              <h3 className="text-lg font-semibold text-zinc-50">
-                滑板
-              </h3>
-              <p className="mt-2 text-sm text-zinc-300">
-                训练进度、动作解析、摔跤复盘。
-              </p>
-              <div className="mt-4 text-sm">
-                <Link
-                  href="/posts"
-                  className="font-medium text-[#00ffff] hover:underline"
-                >
-                  从文章开始 →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 最新文章区块：展示最新 3 篇。 */}
-        <section className="mt-10">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-zinc-50">
-                最新文章
-              </h2>
-              <p className="mt-2 text-sm text-zinc-300">
-                你在 <code>content/posts/</code> 里新增 <code>.md</code>{" "}
-                文件，这里会自动更新。
-              </p>
-            </div>
-            <Link
-              href="/posts"
-              className="text-sm font-medium text-zinc-200 hover:underline"
-            >
-              查看全部 →
-            </Link>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {latest.length === 0 ? (
-              <p className="text-sm text-zinc-300">
-                暂无文章。
-              </p>
-            ) : (
-              latest.map((post) => (
-                <article
-                  key={post.slug}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur transition-colors hover:border-white/18"
-                >
-                  {/* 文章详情链接：slug 决定路径 `/posts/${slug}` */}
+            {/* 用 grid 做两列卡片；小屏自动堆叠。 */}
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+                <h3 className="text-lg font-semibold text-zinc-50">
+                  摄影
+                </h3>
+                <p className="mt-2 text-sm text-zinc-300">
+                  构图、光线、后期与器材小结。
+                </p>
+                <div className="mt-4 text-sm">
                   <Link
-                    href={`/posts/${post.slug}`}
-                    className="text-lg font-semibold text-zinc-50 hover:underline"
+                    href="/posts"
+                    className="font-medium text-[#39ff14] hover:underline"
                   >
-                    {post.title}
+                    从文章开始 →
                   </Link>
-                  <div className="mt-2 text-sm text-zinc-300">
-                    {new Date(post.date).toLocaleDateString()}
-                  </div>
-                  {post.excerpt ? (
-                    <p className="mt-3 text-sm text-zinc-200">
-                      {post.excerpt}
-                    </p>
-                  ) : null}
-                </article>
-              ))
-            )}
-          </div>
-        </section>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+                <h3 className="text-lg font-semibold text-zinc-50">
+                  滑板
+                </h3>
+                <p className="mt-2 text-sm text-zinc-300">
+                  训练进度、动作解析、摔跤复盘。
+                </p>
+                <div className="mt-4 text-sm">
+                  <Link
+                    href="/posts"
+                    className="font-medium text-[#00ffff] hover:underline"
+                  >
+                    从文章开始 →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 最新文章区块：展示最新 3 篇。 */}
+          <section className="mt-10">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-zinc-50">
+                  最新文章
+                </h2>
+                <p className="mt-2 text-sm text-zinc-300">
+                  你在 <code>content/posts/</code> 里新增 <code>.md</code>{" "}
+                  文件，这里会自动更新。
+                </p>
+              </div>
+              <Link
+                href="/posts"
+                className="text-sm font-medium text-zinc-200 hover:underline"
+              >
+                查看全部 →
+              </Link>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {latest.length === 0 ? (
+                <p className="text-sm text-zinc-300">
+                  暂无文章。
+                </p>
+              ) : (
+                latest.map((post) => (
+                  <article
+                    key={post.slug}
+                    className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur transition-colors hover:border-white/18"
+                  >
+                    {/* 文章详情链接：slug 决定路径 `/posts/${slug}` */}
+                    <Link
+                      href={`/posts/${post.slug}`}
+                      className="text-lg font-semibold text-zinc-50 hover:underline"
+                    >
+                      {post.title}
+                    </Link>
+                    <div className="mt-2 text-sm text-zinc-300">
+                      {new Date(post.date).toLocaleDateString()}
+                    </div>
+                    {post.excerpt ? (
+                      <p className="mt-3 text-sm text-zinc-200">
+                        {post.excerpt}
+                      </p>
+                    ) : null}
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
+        </div>
       </main>
 
       {/* 页脚信息：你以后可以替换成个人签名/联系方式等。 */}

@@ -11,6 +11,13 @@
  */
 @import "tailwindcss";
 
+/**
+ * 摄影栏目标题字体（由 layout.tsx 注入 `--font-photo-display`）
+ */
+.font-photo-display {
+  font-family: var(--font-photo-display), ui-serif, Georgia, serif;
+}
+
 :root {
   /**
    * Site base colors (Dark Neon / Acid)

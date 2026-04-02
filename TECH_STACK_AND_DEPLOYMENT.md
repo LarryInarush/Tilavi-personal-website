@@ -25,7 +25,7 @@
 
 ### 1.2 当前已实现的主要页面/能力
 - `/`：主页
-  - 自我介绍、兴趣板块入口
+  - 自我介绍（窄栏）、电影海报墙（较宽通栏）、摄影作品横向条（`w-screen` 通栏：中间三张清晰、最外侧模糊；高行高约 4× 原预览；Cormorant 标题 + 滚动入场）、兴趣板块与最新文章（窄栏）
   - 展示“最新文章”（从本地 Markdown 读取）
 - `/movies`
   - 电影海报墙：支持 hover 动效、点击弹出详情卡片、并提供分页（`?page=`）
@@ -44,6 +44,10 @@
 - 样式：`Tailwind CSS`
 - 动效/交互：
   - 首页 Hero 首次进入动效使用 `framer-motion`（保证动画在客户端稳定触发）
+  - 摄影栏目标题：`framer-motion` 的 `whileInView` 入场；海报墙/轮播等交互同依赖 `framer-motion`
+- 字体（`next/font/google`）：
+  - 正文/UI：`Geist` / `Geist Mono`
+  - 摄影区块标题：`Cormorant Garamond`（`layout.tsx` 注入 `--font-photo-display`，`globals.css` 中 `.font-photo-display`）
 - 渲染方式：
   - 页面为 Server Components（默认）
   - 文章详情的 Markdown 内容会在服务端读取并转换为 HTML，再在页面中通过 `dangerouslySetInnerHTML` 渲染
@@ -72,8 +76,11 @@ tags: ["摄影", "滑板"]
   - 当前仓库内为“自制 SVG 海报”，用于占位与统一风格
   - 你可以替换成真实海报（jpg/png/webp），只需保持路径与 `posterSrc` 对应即可
 - TMDB 增强（可选）：
-  - 当配置 `TMDB_API_KEY` 后，电影模块会优先使用 TMDB 返回的海报 URL（失败自动回退本地海报）
-  - 主要逻辑在 `src/lib/movies.ts` 的 `getMoviesCatalog()`
+  - 当配置 `TMDB_API_KEY` 后，`getMoviesCatalog()` 会并行请求 `zh-CN`（`append_to_response=credits`）与 `en-US`，合并海报、中英文简介/tagline、片长、评分、上映日、国家、导演与主要演员等；任一步失败则单条回退本地数据
+  - 海报 URL 仍优先 TMDB `w780`（失败回退 `public/movies/posters/`）
+- 摄影模块（占位）：
+  - `src/lib/photography.ts` 的 `getPhotographyItems()` 当前复用上述电影海报 URL；替换为真实作品时只需改该数据层
+  - UI：`PhotographyCarouselClient`；首页外层用 `HomeLandingRoute` 中 `left-1/2 -mx-[50vw] w-screen` 做视口全宽通栏
 
 ### 2.3 Markdown 解析链路
 - frontmatter：`gray-matter`

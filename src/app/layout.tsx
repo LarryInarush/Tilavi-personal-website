@@ -6,12 +6,12 @@
  * - 用于定义 HTML/Body 的结构、全局元数据（metadata）和全局字体等
  *
  * 当前做了什么：
- * - 从 `next/font/google` 导入 Geist 字体族（sans/mono），并把字体变量挂到 CSS 变量里
+ * - 从 `next/font/google` 导入 Geist（sans/mono）与 Cormorant Garamond（摄影栏标题），变量挂到 CSS
  * - 引入 `globals.css`，其中包含 Tailwind 的入口与全局色彩变量
  * - 输出 `<html lang="en">` 与 `<body className="min-h-full flex flex-col">`
  */
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +22,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/** 摄影区块标题：偏编辑/展览气质的衬线体，供 `PhotographyCarouselClient` 使用 */
+const photoDisplay = Cormorant_Garamond({
+  variable: "--font-photo-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -37,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${photoDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -46,6 +46,22 @@ export type Movie = {
    * - 无值时保留本地静态数据
    */
   tmdbId?: number;
+  /**
+   * TMDB 拉取后的扩展字段（无 key 或未请求时为 undefined）。
+   */
+  tmdbOverviewZh?: string;
+  tmdbOverviewEn?: string;
+  tmdbTaglineZh?: string;
+  tmdbTaglineEn?: string;
+  tmdbRuntimeMin?: number;
+  tmdbVoteAverage?: number;
+  tmdbVoteCount?: number;
+  tmdbReleaseDate?: string;
+  tmdbOriginalLanguage?: string;
+  tmdbProductionCountries?: string[];
+  directors?: string[];
+  /** 主要演员（姓名 + 片中角色） */
+  castTop?: { name: string; character: string }[];
 };
 
 /**
@@ -201,8 +217,27 @@ export type MoviesPage = {
   items: Movie[];
 };
 
-type TmdbMovieDetail = {
+type TmdbCredits = {
+  cast?: { name: string; character: string }[];
+  crew?: { name: string; job: string }[];
+};
+
+type TmdbMovieDetailZh = {
   poster_path: string | null;
+  overview?: string;
+  tagline?: string;
+  runtime?: number;
+  vote_average?: number;
+  vote_count?: number;
+  release_date?: string;
+  original_language?: string;
+  production_countries?: { name: string }[];
+  credits?: TmdbCredits;
+};
+
+type TmdbMovieDetailEn = {
+  overview?: string;
+  tagline?: string;
 };
 
 function getTmdbApiKey(): string | null {
@@ -211,14 +246,56 @@ function getTmdbApiKey(): string | null {
   return key;
 }
 
-async function fetchTmdbMovieDetail(tmdbId: number, apiKey: string) {
-  const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${apiKey}&language=zh-CN`;
-  const res = await fetch(url, {
-    next: { revalidate: 60 * 60 * 24 }, // 24h cache
-  });
-  if (!res.ok) return null;
-  const data = (await res.json()) as TmdbMovieDetail;
-  return data;
+/**
+ * 并行请求 zh-CN（含 credits）与 en-US（英文简介/tagline），合并为一条 enriched 记录。
+ */
+async function fetchTmdbMovieEnriched(tmdbId: number, apiKey: string) {
+  const base = `https://api.themoviedb.org/3/movie/${tmdbId}`;
+  const [zhRes, enRes] = await Promise.all([
+    fetch(
+      `${base}?api_key=${apiKey}&language=zh-CN&append_to_response=credits`,
+      { next: { revalidate: 60 * 60 * 24 } },
+    ),
+    fetch(`${base}?api_key=${apiKey}&language=en-US`, {
+      next: { revalidate: 60 * 60 * 24 },
+    }),
+  ]);
+  if (!zhRes.ok) return null;
+  const zh = (await zhRes.json()) as TmdbMovieDetailZh;
+  const en = enRes.ok ? ((await enRes.json()) as TmdbMovieDetailEn) : {};
+
+  const crew = zh.credits?.crew ?? [];
+  const directors = crew
+    .filter((c) => c.job === "Director")
+    .map((c) => c.name)
+    .filter(Boolean);
+
+  const castTop = (zh.credits?.cast ?? [])
+    .slice(0, 12)
+    .map((c) => ({
+      name: c.name,
+      character: c.character || "—",
+    }));
+
+  const countries = (zh.production_countries ?? [])
+    .map((c) => c.name)
+    .filter(Boolean);
+
+  return {
+    poster: zh.poster_path,
+    tmdbOverviewZh: zh.overview?.trim() || undefined,
+    tmdbOverviewEn: en.overview?.trim() || undefined,
+    tmdbTaglineZh: zh.tagline?.trim() || undefined,
+    tmdbTaglineEn: en.tagline?.trim() || undefined,
+    tmdbRuntimeMin: typeof zh.runtime === "number" ? zh.runtime : undefined,
+    tmdbVoteAverage: zh.vote_average,
+    tmdbVoteCount: zh.vote_count,
+    tmdbReleaseDate: zh.release_date,
+    tmdbOriginalLanguage: zh.original_language,
+    tmdbProductionCountries: countries.length ? countries : undefined,
+    directors: directors.length ? directors : undefined,
+    castTop: castTop.length ? castTop : undefined,
+  };
 }
 
 function toTmdbPosterUrl(pathname: string | null): string | null {
@@ -241,12 +318,24 @@ export async function getMoviesCatalog(): Promise<Movie[]> {
     MOVIES.map(async (movie) => {
       if (!movie.tmdbId) return movie;
       try {
-        const detail = await fetchTmdbMovieDetail(movie.tmdbId, apiKey);
-        const poster = toTmdbPosterUrl(detail?.poster_path ?? null);
-        if (!poster) return movie;
+        const detail = await fetchTmdbMovieEnriched(movie.tmdbId, apiKey);
+        if (!detail) return movie;
+        const poster = toTmdbPosterUrl(detail.poster ?? null);
         return {
           ...movie,
-          posterSrc: poster,
+          posterSrc: poster ?? movie.posterSrc,
+          tmdbOverviewZh: detail.tmdbOverviewZh,
+          tmdbOverviewEn: detail.tmdbOverviewEn,
+          tmdbTaglineZh: detail.tmdbTaglineZh,
+          tmdbTaglineEn: detail.tmdbTaglineEn,
+          tmdbRuntimeMin: detail.tmdbRuntimeMin,
+          tmdbVoteAverage: detail.tmdbVoteAverage,
+          tmdbVoteCount: detail.tmdbVoteCount,
+          tmdbReleaseDate: detail.tmdbReleaseDate,
+          tmdbOriginalLanguage: detail.tmdbOriginalLanguage,
+          tmdbProductionCountries: detail.tmdbProductionCountries,
+          directors: detail.directors,
+          castTop: detail.castTop,
         };
       } catch {
         return movie;
