@@ -15,7 +15,7 @@
 
 import Link from "next/link";
 import MoviePosterWallClient from "./MoviePosterWallClient";
-import { MOVIES, getMoviesPage } from "@/lib/movies";
+import { getMoviesCatalog, getMoviesPage } from "@/lib/movies";
 import MoviesBackgroundBackdrop from "./MoviesBackgroundBackdrop";
 
 function toInt(value: string | string[] | undefined): number | null {
@@ -26,7 +26,7 @@ function toInt(value: string | string[] | undefined): number | null {
   return n;
 }
 
-export default function MoviesIndexRoute({
+export default async function MoviesIndexRoute({
   searchParams,
 }: {
   searchParams: { page?: string | string[] };
@@ -36,12 +36,15 @@ export default function MoviesIndexRoute({
 
   // 这里决定每页展示数量：为了“海报墙视觉”，用 18（6x3 或 3x6）更均衡
   const pageSize = 18;
-  const data = getMoviesPage({ page, pageSize });
+  const [catalog, data] = await Promise.all([
+    getMoviesCatalog(),
+    getMoviesPage({ page, pageSize }),
+  ]);
 
   return (
     <main className="relative mx-auto w-full max-w-5xl px-6 py-14">
       {/* 背景氛围层：随机挑选一张海报“塞进”霓虹暗背景里 */}
-      <MoviesBackgroundBackdrop movies={MOVIES} />
+      <MoviesBackgroundBackdrop movies={catalog} />
 
       {/* 内容层需要更高 z-index，避免被混合层影响点击 */}
       <div className="relative z-10">

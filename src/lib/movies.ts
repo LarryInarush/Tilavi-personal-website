@@ -40,6 +40,12 @@ export type Movie = {
   notesZh: string;
   notesEn: string;
   genres: string[];
+  /**
+   * TMDB 电影 ID（可选）：
+   * - 有值时可用 TMDB API 拉取海报与补充信息
+   * - 无值时保留本地静态数据
+   */
+  tmdbId?: number;
 };
 
 /**
@@ -63,6 +69,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "I love its architecture: layered structure, shifting time scales, and a parallel narrative rhythm. Every rewatch reveals new details.",
     genres: ["Sci‑Fi", "Thriller"],
+    tmdbId: 27205,
   },
   {
     id: "interstellar-2014",
@@ -77,6 +84,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Grand yet grounded: scientific ideas and emotional arc move in parallel. The score and pacing pull you straight into the void.",
     genres: ["Sci‑Fi", "Drama"],
+    tmdbId: 157336,
   },
   {
     id: "blade-runner-2049",
@@ -91,6 +99,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Visually and atmospherically powerful. The emptiness of the cyber city is hypnotic. The slow pace feels like stepping into a photograph.",
     genres: ["Sci‑Fi", "Neo‑Noir"],
+    tmdbId: 335984,
   },
   {
     id: "whiplash-2014",
@@ -105,6 +114,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "It’s like drilling skate tricks: repetition, slams, and going again. You can feel the pain and thrill of getting better.",
     genres: ["Drama", "Music"],
+    tmdbId: 244786,
   },
   {
     id: "parasite-2019",
@@ -119,6 +129,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Surgical storytelling: you think it’s comedy, then it flips into thriller. The spatial choreography feels like solving a real-world puzzle.",
     genres: ["Thriller", "Drama"],
+    tmdbId: 496243,
   },
   {
     id: "spider-verse-2018",
@@ -133,6 +144,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Maximal style. Colors and pacing feel like rap flow—breaks, hits, layered visual sampling.",
     genres: ["Animation", "Action"],
+    tmdbId: 324857,
   },
   {
     id: "mad-max-fury-road-2015",
@@ -147,6 +159,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Peak action design with crystal-clear visual language—motion lines carved into your retina.",
     genres: ["Action", "Adventure"],
+    tmdbId: 76341,
   },
   {
     id: "her-2013",
@@ -161,6 +174,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Restrained colors and emotions, but it lingers. Its ‘tech’ isn’t flashy—it’s in the everyday details.",
     genres: ["Romance", "Sci‑Fi"],
+    tmdbId: 152601,
   },
   {
     id: "the-dark-knight-2008",
@@ -175,6 +189,7 @@ export const MOVIES: Movie[] = [
     notesEn:
       "Hard tension and themes. Not just a superhero film—more like a debate about rules and human nature.",
     genres: ["Action", "Crime"],
+    tmdbId: 155,
   },
 ];
 
@@ -186,11 +201,68 @@ export type MoviesPage = {
   items: Movie[];
 };
 
+type TmdbMovieDetail = {
+  poster_path: string | null;
+};
+
+function getTmdbApiKey(): string | null {
+  const key = process.env.TMDB_API_KEY?.trim();
+  if (!key) return null;
+  return key;
+}
+
+async function fetchTmdbMovieDetail(tmdbId: number, apiKey: string) {
+  const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${apiKey}&language=zh-CN`;
+  const res = await fetch(url, {
+    next: { revalidate: 60 * 60 * 24 }, // 24h cache
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as TmdbMovieDetail;
+  return data;
+}
+
+function toTmdbPosterUrl(pathname: string | null): string | null {
+  if (!pathname) return null;
+  return `https://image.tmdb.org/t/p/w780${pathname}`;
+}
+
+/**
+ * 获取“可供 UI 使用”的电影列表（优先 TMDB 海报，失败自动回退本地海报）。
+ *
+ * 行为策略：
+ * - 若未配置 `TMDB_API_KEY`：直接返回本地 MOVIES（无网络依赖）
+ * - 若配置了 key：逐条尝试拉取海报；任何失败都只影响单条，不中断整体渲染
+ */
+export async function getMoviesCatalog(): Promise<Movie[]> {
+  const apiKey = getTmdbApiKey();
+  if (!apiKey) return MOVIES;
+
+  const enriched = await Promise.all(
+    MOVIES.map(async (movie) => {
+      if (!movie.tmdbId) return movie;
+      try {
+        const detail = await fetchTmdbMovieDetail(movie.tmdbId, apiKey);
+        const poster = toTmdbPosterUrl(detail?.poster_path ?? null);
+        if (!poster) return movie;
+        return {
+          ...movie,
+          posterSrc: poster,
+        };
+      } catch {
+        return movie;
+      }
+    }),
+  );
+
+  return enriched;
+}
+
 /**
  * 读取“首页电影预览”数据：固定 9 个。
  */
-export function getHomeMoviePosters(): Movie[] {
-  return MOVIES.slice(0, 9);
+export async function getHomeMoviePosters(): Promise<Movie[]> {
+  const catalog = await getMoviesCatalog();
+  return catalog.slice(0, 9);
 }
 
 /**
@@ -200,21 +272,22 @@ export function getHomeMoviePosters(): Movie[] {
  * - page 从 1 开始（对 URL 更自然：`/movies?page=2`）
  * - 任何非法 page 输入都会被收敛到有效范围（避免页面崩溃）
  */
-export function getMoviesPage({
+export async function getMoviesPage({
   page,
   pageSize,
 }: {
   page: number;
   pageSize: number;
-}): MoviesPage {
+}): Promise<MoviesPage> {
+  const catalog = await getMoviesCatalog();
   const safePageSize = Math.max(1, Math.min(pageSize, 48));
-  const totalItems = MOVIES.length;
+  const totalItems = catalog.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / safePageSize));
   const safePage = Math.max(1, Math.min(page, totalPages));
 
   const start = (safePage - 1) * safePageSize;
   const end = start + safePageSize;
-  const items = MOVIES.slice(start, end);
+  const items = catalog.slice(start, end);
 
   return {
     page: safePage,

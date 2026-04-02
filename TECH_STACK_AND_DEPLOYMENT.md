@@ -71,6 +71,9 @@ tags: ["摄影", "滑板"]
 - 海报资源：`site/public/movies/posters/`
   - 当前仓库内为“自制 SVG 海报”，用于占位与统一风格
   - 你可以替换成真实海报（jpg/png/webp），只需保持路径与 `posterSrc` 对应即可
+- TMDB 增强（可选）：
+  - 当配置 `TMDB_API_KEY` 后，电影模块会优先使用 TMDB 返回的海报 URL（失败自动回退本地海报）
+  - 主要逻辑在 `src/lib/movies.ts` 的 `getMoviesCatalog()`
 
 ### 2.3 Markdown 解析链路
 - frontmatter：`gray-matter`
@@ -156,6 +159,19 @@ tags: ["摄影", "滑板"]
 - 构建：`npm run build`
 - 生产启动：`npm run start`
 - Lint：`npm run lint`（当前配置由 eslint-config-next 驱动）
+
+## 6.1 TMDB API Key 配置（你拿到 key 后怎么做）
+1. 在 `site/` 目录下创建 `.env.local`
+2. 添加一行：
+
+```bash
+TMDB_API_KEY=你的_tmdb_api_key
+```
+
+3. 重启开发服务（如果已在运行，先 Ctrl+C 再 `npm run dev`）
+4. 打开 `/movies` 验证：
+   - 如果 key 可用：海报会优先显示 TMDB 海报
+   - 如果 key 无效或网络失败：会自动回退到本地 `public/movies/posters/*.svg`
 
 ## 7. 评论功能规划（当前不接入，但要能看懂未来怎么做）
 ### 7.1 选择的工具：Giscus

@@ -12,8 +12,8 @@
 import MoviePosterWallClient from "./movies/MoviePosterWallClient";
 import { getHomeMoviePosters } from "@/lib/movies";
 
-export default function HomeMoviesPosterWallSection() {
-  const movies = getHomeMoviePosters();
+export default async function HomeMoviesPosterWallSection() {
+  const movies = await getHomeMoviePosters();
 
   return (
     <MoviePosterWallClient
