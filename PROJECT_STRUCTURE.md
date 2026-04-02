@@ -39,7 +39,9 @@ site/
       not-found.tsx            # 404 页面（Next.js App Router）
       page.tsx                 # 路由入口 `/`（极薄）
       HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名）
-      HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；framer-motion）
+      HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；承载品牌/双语介绍）
+      TheTilaviSiteHeader.tsx # 站点 Header（叠加在 Hero 上的极简导航层）
+      TheTilaviLogoMark.tsx   # TheTilavi Logo SVG mark（霓虹/酸性风格）
       posts/
         page.tsx               # 路由入口 `/posts`（极薄）
         PostsIndexRoute.tsx   # `/posts` 列表的真正实现

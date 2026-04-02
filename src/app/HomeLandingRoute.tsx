@@ -17,6 +17,7 @@
 import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
 import HomeHeroLanding from "./HomeHeroLanding";
+import TheTilaviSiteHeader from "./TheTilaviSiteHeader";
 
 /**
  * Personal home page content (route component).
@@ -35,48 +36,25 @@ export default async function HomeLandingRoute() {
   const latest = posts.slice(0, 3);
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 font-sans dark:bg-black">
-      {/* Sticky 顶栏：固定在页面顶部，增强个人主页的“站点感”。 */}
-      <header className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur dark:border-zinc-800 dark:bg-black/70">
-        <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-4">
-          {/* 左侧：站点 Logo/名称 */}
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-zinc-900 text-center text-sm font-semibold text-zinc-50 dark:bg-zinc-50 dark:text-zinc-900">
-              P
-            </div>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">
-                你的名字
-              </div>
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">
-                摄影 · 滑板 · 随笔
-              </div>
-            </div>
+    <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(57,255,20,0.10),transparent_60%),radial-gradient(900px_500px_at_80%_-20%,rgba(191,0,255,0.10),transparent_55%),radial-gradient(800px_450px_at_60%_110%,rgba(0,255,255,0.08),transparent_60%),linear-gradient(180deg,#050608,rgba(5,6,8,0.92))] font-sans text-zinc-100">
+      {/* 顶部舞台：Header 叠在 Hero 上，共享背景（更“艺术性”的首屏合成） */}
+      <div className="relative">
+        <HomeHeroLanding />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30">
+          <div className="pointer-events-auto">
+            <TheTilaviSiteHeader />
           </div>
-
-          {/* 右侧：导航链接 */}
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              href="/posts"
-              className="text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-zinc-50"
-            >
-              文章
-            </Link>
-          </nav>
         </div>
-      </header>
-
-      {/* 首页顶部 Hero：方案 C（照片切片 + 首次进入动画） */}
-      <HomeHeroLanding />
+      </div>
 
       {/* 页面主体：控制最大宽度，保证桌面端观感舒服。 */}
       <main className="mx-auto w-full max-w-4xl px-6 py-12">
         {/* 个人简介卡片：你可以长期维护并随时扩展文案。 */}
-        <section className="rounded-3xl bg-white p-8 shadow-sm dark:bg-black/30">
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.25)] backdrop-blur">
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">
             你好，我是你
           </h1>
-          <p className="mt-3 max-w-2xl text-zinc-700 dark:text-zinc-300">
+          <p className="mt-3 max-w-2xl text-zinc-200">
             这里记录我在摄影、滑板和生活里的有意思瞬间：构图练习、器材心得、动作复盘，以及一些随笔小想法。
           </p>
 
@@ -84,13 +62,13 @@ export default async function HomeLandingRoute() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/posts"
-              className="rounded-xl bg-zinc-950 px-4 py-2 text-sm font-semibold text-zinc-50 transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900"
+              className="rounded-xl bg-[#39ff14] px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-[#2ee80e]"
             >
               查看最新文章
             </Link>
             <a
               href="#interests"
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-black/30 dark:text-zinc-50 dark:hover:bg-black/50"
+              className="rounded-xl border border-white/12 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors hover:bg-white/10"
             >
               兴趣与内容
             </a>
@@ -101,10 +79,10 @@ export default async function HomeLandingRoute() {
         <section id="interests" className="mt-10">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+              <h2 className="text-2xl font-semibold text-zinc-50">
                 兴趣板块
               </h2>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-300">
                 你可以用文章持续扩展这些方向。
               </p>
             </div>
@@ -112,34 +90,34 @@ export default async function HomeLandingRoute() {
 
           {/* 用 grid 做两列卡片；小屏自动堆叠。 */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-black/30">
-              <h3 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+              <h3 className="text-lg font-semibold text-zinc-50">
                 摄影
               </h3>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-300">
                 构图、光线、后期与器材小结。
               </p>
               <div className="mt-4 text-sm">
                 <Link
                   href="/posts"
-                  className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                  className="font-medium text-[#39ff14] hover:underline"
                 >
                   从文章开始 →
                 </Link>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-black/30">
-              <h3 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
+              <h3 className="text-lg font-semibold text-zinc-50">
                 滑板
               </h3>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-300">
                 训练进度、动作解析、摔跤复盘。
               </p>
               <div className="mt-4 text-sm">
                 <Link
                   href="/posts"
-                  className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                  className="font-medium text-[#00ffff] hover:underline"
                 >
                   从文章开始 →
                 </Link>
@@ -152,17 +130,17 @@ export default async function HomeLandingRoute() {
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+              <h2 className="text-2xl font-semibold text-zinc-50">
                 最新文章
               </h2>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-300">
                 你在 <code>content/posts/</code> 里新增 <code>.md</code>{" "}
                 文件，这里会自动更新。
               </p>
             </div>
             <Link
               href="/posts"
-              className="text-sm font-medium text-zinc-700 hover:underline dark:text-zinc-300 dark:hover:text-zinc-50"
+              className="text-sm font-medium text-zinc-200 hover:underline"
             >
               查看全部 →
             </Link>
@@ -170,27 +148,27 @@ export default async function HomeLandingRoute() {
 
           <div className="mt-6 space-y-4">
             {latest.length === 0 ? (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm text-zinc-300">
                 暂无文章。
               </p>
             ) : (
               latest.map((post) => (
                 <article
                   key={post.slug}
-                  className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-black/30 dark:hover:border-zinc-700"
+                  className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur transition-colors hover:border-white/18"
                 >
                   {/* 文章详情链接：slug 决定路径 `/posts/${slug}` */}
                   <Link
                     href={`/posts/${post.slug}`}
-                    className="text-lg font-semibold text-zinc-950 hover:underline dark:text-zinc-50"
+                    className="text-lg font-semibold text-zinc-50 hover:underline"
                   >
                     {post.title}
                   </Link>
-                  <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  <div className="mt-2 text-sm text-zinc-300">
                     {new Date(post.date).toLocaleDateString()}
                   </div>
                   {post.excerpt ? (
-                    <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="mt-3 text-sm text-zinc-200">
                       {post.excerpt}
                     </p>
                   ) : null}
@@ -202,8 +180,8 @@ export default async function HomeLandingRoute() {
       </main>
 
       {/* 页脚信息：你以后可以替换成个人签名/联系方式等。 */}
-      <footer className="border-t border-zinc-200 py-10 text-center text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-        © {new Date().getFullYear()} 你的名字 · 用 Next.js + Tailwind 写主页
+      <footer className="border-t border-white/10 py-10 text-center text-xs text-zinc-400">
+        © {new Date().getFullYear()} TheTilavi · Built with Next.js + Tailwind
       </footer>
     </div>
   );
