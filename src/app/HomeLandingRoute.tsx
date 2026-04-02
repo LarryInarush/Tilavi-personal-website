@@ -16,6 +16,7 @@
  */
 import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
+import HomeHeroLanding from "./HomeHeroLanding";
 
 /**
  * Personal home page content (route component).
@@ -64,6 +65,9 @@ export default async function HomeLandingRoute() {
           </nav>
         </div>
       </header>
+
+      {/* 首页顶部 Hero：方案 C（照片切片 + 首次进入动画） */}
+      <HomeHeroLanding />
 
       {/* 页面主体：控制最大宽度，保证桌面端观感舒服。 */}
       <main className="mx-auto w-full max-w-4xl px-6 py-12">

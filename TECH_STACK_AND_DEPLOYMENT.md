@@ -40,6 +40,8 @@
 - 框架：`Next.js`（App Router）
 - 语言：`TypeScript`
 - 样式：`Tailwind CSS`
+- 动效/交互：
+  - 首页 Hero 首次进入动效使用 `framer-motion`（保证动画在客户端稳定触发）
 - 渲染方式：
   - 页面为 Server Components（默认）
   - 文章详情的 Markdown 内容会在服务端读取并转换为 HTML，再在页面中通过 `dangerouslySetInnerHTML` 渲染

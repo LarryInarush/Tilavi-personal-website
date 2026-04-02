@@ -39,6 +39,7 @@ site/
       not-found.tsx            # 404 页面（Next.js App Router）
       page.tsx                 # 路由入口 `/`（极薄）
       HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名）
+      HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；framer-motion）
       posts/
         page.tsx               # 路由入口 `/posts`（极薄）
         PostsIndexRoute.tsx   # `/posts` 列表的真正实现
