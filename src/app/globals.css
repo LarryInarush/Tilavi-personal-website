@@ -1,3 +1,14 @@
+/**
+ * File: `src/app/globals.css`
+ *
+ * 作用：
+ * - Tailwind 的入口样式（`@import "tailwindcss";`）。
+ * - 轻量定制一些全局 CSS 变量，用来控制浅色/深色下的背景与前景色。
+ *
+ * 说明：
+ * - 本项目目前使用 Tailwind utility class，大部分样式不需要写到这里。
+ * - 这个文件主要提供基础配色和字体相关变量。
+ */
 @import "tailwindcss";
 
 :root {
@@ -22,5 +33,6 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
