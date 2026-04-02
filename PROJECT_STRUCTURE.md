@@ -53,6 +53,7 @@ site/
         page.tsx               # 路由入口 `/movies`（极薄，支持 `?page=`）
         MoviesIndexRoute.tsx   # `/movies` 页面实现：分页 + 海报墙
         MoviePosterWallClient.tsx # 海报墙交互层：滚动入场/hover/点击详情卡片（复用）
+        MoviesBackgroundBackdrop.tsx # `/movies` 背景氛围层：服务端随机海报融入暗黑霓虹底色（避免 hydration mismatch）
     lib/
       posts.ts                 # 数据层：读取 content/posts/*.md 并解析
       movies.ts                # 电影数据层：电影列表 + 分页

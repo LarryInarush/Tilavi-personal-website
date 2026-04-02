@@ -62,3 +62,19 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+
+/**
+ * Movies page backdrop: soft fade-in
+ *
+ * 说明：
+ * - `/movies` 页面背景海报在服务端随机挑选并渲染，为避免“突然出现”的割裂感，
+ *   这里提供一个轻量淡入动画（不依赖额外库）。
+ */
+@keyframes moviesBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -15,7 +15,8 @@
 
 import Link from "next/link";
 import MoviePosterWallClient from "./MoviePosterWallClient";
-import { getMoviesPage } from "@/lib/movies";
+import { MOVIES, getMoviesPage } from "@/lib/movies";
+import MoviesBackgroundBackdrop from "./MoviesBackgroundBackdrop";
 
 function toInt(value: string | string[] | undefined): number | null {
   if (!value) return null;
@@ -38,15 +39,20 @@ export default function MoviesIndexRoute({
   const data = getMoviesPage({ page, pageSize });
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-6 py-14">
-      <MoviePosterWallClient
-        movies={data.items}
-        title="全部电影 / Movies"
-        subtitle={`第 ${data.page} / ${data.totalPages} 页 · 共 ${data.totalItems} 部`}
-      />
+    <main className="relative mx-auto w-full max-w-5xl px-6 py-14">
+      {/* 背景氛围层：随机挑选一张海报“塞进”霓虹暗背景里 */}
+      <MoviesBackgroundBackdrop movies={MOVIES} />
 
-      {/* 分页导航 */}
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+      {/* 内容层需要更高 z-index，避免被混合层影响点击 */}
+      <div className="relative z-10">
+        <MoviePosterWallClient
+          movies={data.items}
+          title="全部电影 / Movies"
+          subtitle={`第 ${data.page} / ${data.totalPages} 页 · 共 ${data.totalItems} 部`}
+        />
+
+        {/* 分页导航 */}
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Link
             href={`/movies?page=${Math.max(1, data.page - 1)}`}
@@ -93,6 +99,7 @@ export default function MoviesIndexRoute({
               </Link>
             );
           })}
+        </div>
         </div>
       </div>
     </main>
