@@ -40,6 +40,7 @@ site/
       page.tsx                 # 路由入口 `/`（极薄）
       HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名）
       HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；承载品牌/双语介绍）
+      HomeMoviesPosterWallSection.tsx # 首页电影海报墙栏目（9 张预览，标题跳转 `/movies`）
       TheTilaviSiteHeader.tsx # 站点 Header（叠加在 Hero 上的极简导航层）
       TheTilaviLogoMark.tsx   # TheTilavi Logo SVG mark（霓虹/酸性风格）
       posts/
@@ -48,10 +49,17 @@ site/
         [slug]/
           page.tsx            # 路由入口 `/posts/[slug]`（含 generateStaticParams）
           PostDetailsRoute.tsx# 详情页真正的 UI 与 Markdown 渲染
+      movies/
+        page.tsx               # 路由入口 `/movies`（极薄，支持 `?page=`）
+        MoviesIndexRoute.tsx   # `/movies` 页面实现：分页 + 海报墙
+        MoviePosterWallClient.tsx # 海报墙交互层：滚动入场/hover/点击详情卡片（复用）
     lib/
       posts.ts                 # 数据层：读取 content/posts/*.md 并解析
+      movies.ts                # 电影数据层：电影列表 + 分页
   public/
     *.svg / *.ico             # 静态资源（图标等）
+    movies/
+      posters/*.svg            # 电影海报资源（当前为自制 SVG，可替换为真实海报）
 ```
 
 ## 4. 路由对应关系（非常重要）

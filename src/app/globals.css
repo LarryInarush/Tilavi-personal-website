@@ -12,8 +12,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /**
+   * Site base colors (Dark Neon / Acid)
+   *
+   * 说明：
+   * - 你明确希望全站走暗黑霓虹 + 酸性元素风格，因此这里把“默认背景”改为深色基底。
+   * - 页面级别仍然可以通过局部容器加深/变亮来创造层次（例如 hero、卡片、hover glow）。
+   */
+  --background: #050608;
+  --foreground: #ededed;
+
+  /**
+   * 全站背景图层（radial gradients）。
+   * - 灵感来源：你喜欢的“海报 hover 霓虹背景”
+   * - 设计意图：让深色不死黑、有一点“夜色+霓虹雾”的呼吸感
+   */
+  --site-bg: radial-gradient(
+      900px 360px at 18% 0%,
+      rgba(57, 255, 20, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 360px at 82% 0%,
+      rgba(0, 255, 255, 0.10),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 420px at 70% 110%,
+      rgba(191, 0, 255, 0.08),
+      transparent 62%
+    ),
+    linear-gradient(180deg, #050608, rgba(5, 6, 8, 0.92));
 }
 
 @theme inline {
@@ -23,15 +52,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* 本站整体审美以深色为主，因此不再根据系统深色模式切换底色。 */
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: var(--site-bg);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;

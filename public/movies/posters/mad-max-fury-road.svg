@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050608"/>
+      <stop offset="0.55" stop-color="#101010"/>
+      <stop offset="1" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="dust" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="rgba(191,0,255,0.10)"/>
+      <stop offset="0.5" stop-color="rgba(57,255,20,0.08)"/>
+      <stop offset="1" stop-color="rgba(0,255,255,0.08)"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="speed" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M0 10H28" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+      <path d="M0 22H28" stroke="rgba(255,255,255,0.04)" stroke-width="1.6"/>
+    </pattern>
+  </defs>
+
+  <rect width="900" height="1350" fill="url(#bg)"/>
+  <rect width="900" height="1350" fill="url(#speed)" opacity="0.75"/>
+  <rect width="900" height="1350" fill="url(#dust)" opacity="0.9"/>
+
+  <g filter="url(#glow)">
+    <path d="M110 780 L820 520" stroke="#39ff14" stroke-width="12" stroke-linecap="round" opacity="0.75"/>
+    <path d="M110 860 L820 600" stroke="rgba(0,255,255,0.65)" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+    <path d="M110 940 L820 680" stroke="rgba(191,0,255,0.55)" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
+  </g>
+
+  <text x="90" y="170" fill="#e7e7e7" font-size="26" font-family="ui-monospace, Menlo, Monaco, monospace" opacity="0.85">
+    SPEED / DUST / LINE OF ACTION
+  </text>
+
+  <text x="90" y="1040" fill="#ffffff" font-size="66" font-weight="850"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+    Mad Max: Fury Road
+  </text>
+  <text x="92" y="1096" fill="#cfd4dc" font-size="30"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" opacity="0.9">
+    Â´Kï · 2015
+  </text>
+
+  <text x="90" y="1230" fill="#9aa3b2" font-size="22" font-family="ui-monospace, Menlo, Monaco, monospace">
+    One chase, infinite energy.
+  </text>
+</svg>
+

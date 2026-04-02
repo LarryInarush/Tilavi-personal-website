@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050608"/>
+      <stop offset="0.55" stop-color="#0a0a12"/>
+      <stop offset="1" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00ffff"/>
+      <stop offset="0.5" stop-color="#39ff14"/>
+      <stop offset="1" stop-color="#ff00ff"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="noise" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="2" r="0.6" fill="rgba(255,255,255,0.06)"/>
+      <circle cx="4" cy="5" r="0.7" fill="rgba(255,255,255,0.05)"/>
+    </pattern>
+  </defs>
+
+  <rect width="900" height="1350" fill="url(#bg)"/>
+  <rect width="900" height="1350" fill="url(#noise)" opacity="0.9"/>
+
+  <g filter="url(#glow)">
+    <path d="M450 300 L520 520 L760 560 L540 700 L610 940 L450 800 L290 940 L360 700 L140 560 L380 520 Z"
+      fill="rgba(0,0,0,0.22)" stroke="url(#neon)" stroke-width="8" />
+    <path d="M260 560 H640" stroke="rgba(57,255,20,0.45)" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <text x="90" y="170" fill="#e7e7e7" font-size="26" font-family="ui-monospace, Menlo, Monaco, monospace" opacity="0.85">
+    ORDER / CHAOS / THE LINE
+  </text>
+
+  <text x="90" y="1040" fill="#ffffff" font-size="72" font-weight="860"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+    The Dark Knight
+  </text>
+  <text x="92" y="1096" fill="#cfd4dc" font-size="30"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" opacity="0.9">
+    Ñ—‘ë · 2008
+  </text>
+
+  <text x="90" y="1230" fill="#9aa3b2" font-size="22" font-family="ui-monospace, Menlo, Monaco, monospace">
+    A rulebook meets a match.
+  </text>
+</svg>
+

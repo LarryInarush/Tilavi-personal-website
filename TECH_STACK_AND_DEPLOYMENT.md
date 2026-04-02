@@ -27,6 +27,8 @@
 - `/`：主页
   - 自我介绍、兴趣板块入口
   - 展示“最新文章”（从本地 Markdown 读取）
+- `/movies`
+  - 电影海报墙：支持 hover 动效、点击弹出详情卡片、并提供分页（`?page=`）
 - `/posts`
   - 文章列表页：读取所有 Markdown frontmatter，渲染列表卡片
 - `/posts/[slug]`
@@ -63,6 +65,12 @@ tags: ["摄影", "滑板"]
 数据层逻辑（当前实现）负责两类任务：
 1. 读取所有文章的 frontmatter，形成列表 meta（给 `/` 与 `/posts` 用）
 2. 读取单篇文章的内容并渲染 Markdown -> HTML（给 `/posts/[slug]` 用）
+
+电影内容（本地数据源）：
+- 数据：`site/src/lib/movies.ts`（电影列表 + 分页逻辑）
+- 海报资源：`site/public/movies/posters/`
+  - 当前仓库内为“自制 SVG 海报”，用于占位与统一风格
+  - 你可以替换成真实海报（jpg/png/webp），只需保持路径与 `posterSrc` 对应即可
 
 ### 2.3 Markdown 解析链路
 - frontmatter：`gray-matter`

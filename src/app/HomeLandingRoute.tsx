@@ -18,6 +18,7 @@ import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
 import HomeHeroLanding from "./HomeHeroLanding";
 import TheTilaviSiteHeader from "./TheTilaviSiteHeader";
+import HomeMoviesPosterWallSection from "./HomeMoviesPosterWallSection";
 
 /**
  * Personal home page content (route component).
@@ -36,7 +37,7 @@ export default async function HomeLandingRoute() {
   const latest = posts.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(57,255,20,0.10),transparent_60%),radial-gradient(900px_500px_at_80%_-20%,rgba(191,0,255,0.10),transparent_55%),radial-gradient(800px_450px_at_60%_110%,rgba(0,255,255,0.08),transparent_60%),linear-gradient(180deg,#050608,rgba(5,6,8,0.92))] font-sans text-zinc-100">
+    <div className="min-h-screen font-sans text-zinc-100">
       {/* 顶部舞台：Header 叠在 Hero 上，共享背景（更“艺术性”的首屏合成） */}
       <div className="relative">
         <HomeHeroLanding />
@@ -74,6 +75,9 @@ export default async function HomeLandingRoute() {
             </a>
           </div>
         </section>
+
+        {/* 电影栏目：9 张海报预览（标题可进入完整电影页） */}
+        <HomeMoviesPosterWallSection />
 
         {/* 兴趣板块：用来承接“后续持续扩展”。目前没有做分类筛选，只是内容入口。 */}
         <section id="interests" className="mt-10">
