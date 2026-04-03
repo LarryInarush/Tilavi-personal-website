@@ -81,6 +81,7 @@ tags: ["摄影", "滑板"]
 - 摄影模块（占位）：
   - `src/lib/photography.ts` 的 `getPhotographyItems()` 当前复用上述电影海报 URL；替换为真实作品时只需改该数据层
   - UI：`PhotographyCarouselClient`；首页外层用 `HomeLandingRoute` 中 `left-1/2 -mx-[50vw] w-screen` 做视口全宽通栏
+  - 轮播实现要点（2026-04-03）：**三倍 `items` 横向轨道** + **`useMotionValue` + `framer-motion` 的 `animate()`** 只动画轨道的 `translateX`（左右切换时为整体平移，而非重挂载导致的「全员从左侧重新入场」）；`ResizeObserver` 随视口宽度重算单卡宽度（仍满足「约五张落入视口、单卡不超约 30vw」）；首尾衔接时先**动画到边界复本索引**再**瞬时对齐**回中间段索引；卡片间距常量 **`TRACK_GAP_PX = 24`**；全屏 `layoutId` 仅打在物理居中那张，避免三份重复条目上的 ID 冲突。
 
 ### 2.3 Markdown 解析链路
 - frontmatter：`gray-matter`

@@ -1,16 +1,23 @@
 /**
  * File: `src/app/PhotographyCarouselClient.tsx`
  * Purpose:
- * - 首页「摄影作品」横向陈列：竖版画幅（高大于宽）；每张宽度不超过视口约 30% 且一行五张不撑出横向滚动；
- *   中间三张清晰、仅最外侧卡片模糊；左右箭头切换焦点；
- * - 卡片 hover 霓虹风格反馈；点击后全屏查看，使用 `layoutId` 做共享元素过渡。
+ * - 首页「摄影作品」横向陈列：竖版画幅（高大于宽）；每张宽度不超过视口约 30% 且一行约五张落在视口内；
+ *   中间三张清晰、仅最外侧卡片模糊；左右箭头切换时整条轨道平移（轮播），避免逐项从左侧滑入；
+ * - 卡片 hover 霓虹风格反馈；点击后全屏查看，使用 `layoutId` 做共享元素过渡（仅当前居中张启用 layoutId，避免重复 id）。
  * - 标题使用全站注入的 `--font-photo-display`（Cormorant Garamond），滚动入场动画。
  */
 
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { AnimatePresence, animate, motion, useMotionValue } from "framer-motion";
 import type { PhotographyItem } from "@/lib/photography";
 
 type Props = {
@@ -19,17 +26,22 @@ type Props = {
   subtitle?: string;
 };
 
-function wrapIndex(i: number, len: number) {
-  return ((i % len) + len) % len;
+/** 卡片间距（px），略大于原先 gap-2，使陈列更透气 */
+const TRACK_GAP_PX = 24;
+
+type Measure = {
+  vpW: number;
+  cardW: number;
+};
+
+function computeX(m: Measure, physicalCenter: number): number {
+  const step = m.cardW + TRACK_GAP_PX;
+  return m.vpW / 2 - m.cardW / 2 - physicalCenter * step;
 }
 
-/**
- * 根据条目数量决定展示几张（最多 5 张），避免条目过少时出现重复 layoutId。
- */
-function slotOffsetsForCount(n: number) {
-  const count = Math.min(5, Math.max(1, n));
-  const half = Math.floor(count / 2);
-  return Array.from({ length: count }, (_, i) => i - half);
+function computeCardW(vpW: number): number {
+  const gaps = 4 * TRACK_GAP_PX;
+  return Math.min(vpW * 0.3, (vpW - gaps) / 5);
 }
 
 export default function PhotographyCarouselClient({
@@ -37,18 +49,60 @@ export default function PhotographyCarouselClient({
   title,
   subtitle,
 }: Props) {
-  const [active, setActive] = useState(0);
+  const n = items.length;
+  const extended = useMemo(
+    () => (n > 0 ? [...items, ...items, ...items] : []),
+    [items, n],
+  );
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const animRef = useRef<ReturnType<typeof animate> | null>(null);
+  /** 物理滑道索引：始终在三倍数组的中间一段 [n, 2n-1]，仅在绕圈时用动画衔接并重置 */
+  const [physicalCenter, setPhysicalCenter] = useState(() =>
+    Math.max(0, n),
+  );
+  const [measure, setMeasure] = useState<Measure | null>(null);
+  const measureRef = useRef<Measure | null>(null);
+  measureRef.current = measure;
+  /** 平移进行中时不给非居中副本挂 layoutId，避免 Framer 冲突 */
+  const [isSlideAnimating, setIsSlideAnimating] = useState(false);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
 
-  const n = items.length;
-  const safeN = Math.max(1, n);
+  const remeasure = useCallback(() => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const vpW = vp.clientWidth;
+    const cardW = computeCardW(vpW);
+    setMeasure((prev) =>
+      prev && prev.vpW === vpW && prev.cardW === cardW
+        ? prev
+        : { vpW, cardW },
+    );
+  }, []);
 
-  const go = useCallback(
-    (delta: number) => {
-      setActive((a) => wrapIndex(a + delta, safeN));
-    },
-    [safeN],
-  );
+  useLayoutEffect(() => {
+    remeasure();
+  }, [remeasure, n, extended.length]);
+
+  useEffect(() => {
+    const ro = new ResizeObserver(() => remeasure());
+    const el = viewportRef.current;
+    if (el) ro.observe(el);
+    return () => ro.disconnect();
+  }, [remeasure]);
+
+  /** 条目数变化时回到中间段起点 */
+  useLayoutEffect(() => {
+    if (n <= 0) return;
+    setPhysicalCenter(n);
+  }, [n]);
+
+  useLayoutEffect(() => {
+    if (!measure || n <= 0) return;
+    x.set(computeX(measure, physicalCenter));
+  }, [measure, n, physicalCenter, x]);
 
   useEffect(() => {
     if (!lightboxId) return;
@@ -59,29 +113,66 @@ export default function PhotographyCarouselClient({
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxId]);
 
-  const slots = useMemo(() => {
-    const offsets = slotOffsetsForCount(safeN);
-    return offsets.map((off) => {
-      const idx = wrapIndex(active + off, safeN);
-      return {
-        offset: off,
-        item: items[idx],
-        abs: Math.abs(off),
-      };
-    });
-  }, [active, items, safeN]);
+  const runSlide = useCallback(
+    (nextPhysical: number, onCompleteExtra?: () => void) => {
+      if (!measure || n <= 0) return;
+      animRef.current?.stop();
+      setIsSlideAnimating(true);
+      const target = computeX(measure, nextPhysical);
+      animRef.current = animate(x, target, {
+        duration: 0.42,
+        ease: [0.22, 1, 0.36, 1],
+        onComplete: () => {
+          if (onCompleteExtra) {
+            onCompleteExtra();
+          } else {
+            setPhysicalCenter(nextPhysical);
+          }
+          setIsSlideAnimating(false);
+        },
+      });
+    },
+    [measure, n, x],
+  );
+
+  const goNext = useCallback(() => {
+    if (!measure || n <= 1) return;
+    if (physicalCenter >= 2 * n - 1) {
+      runSlide(2 * n, () => {
+        setPhysicalCenter(n);
+        const m = measureRef.current;
+        if (m) x.set(computeX(m, n));
+      });
+      return;
+    }
+    runSlide(physicalCenter + 1);
+  }, [measure, n, physicalCenter, runSlide, x]);
+
+  const goPrev = useCallback(() => {
+    if (!measure || n <= 1) return;
+    if (physicalCenter <= n) {
+      runSlide(n - 1, () => {
+        setPhysicalCenter(2 * n - 1);
+        const m = measureRef.current;
+        if (m) x.set(computeX(m, 2 * n - 1));
+      });
+      return;
+    }
+    runSlide(physicalCenter - 1);
+  }, [measure, n, physicalCenter, runSlide, x]);
 
   const lightboxItem = lightboxId
     ? items.find((x) => x.id === lightboxId) ?? null
     : null;
 
-  if (items.length === 0) {
+  if (n === 0) {
     return null;
   }
 
+  const cardWidthPx = measure?.cardW;
+
   return (
     <section className="w-full max-w-none">
-      {/* 标题：居中、大字、滚动入场 */}
       <motion.div
         className="relative z-10 px-4"
         initial={{ opacity: 0, y: 48, filter: "blur(10px)" }}
@@ -104,94 +195,113 @@ export default function PhotographyCarouselClient({
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 0.7,
+              delay: 0.12,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
             {subtitle}
           </motion.p>
         ) : null}
       </motion.div>
 
-      <div className="relative mt-10 w-full max-w-full overflow-x-hidden py-8">
+      <div
+        ref={viewportRef}
+        className="relative mt-10 w-full max-w-full overflow-x-hidden py-8"
+      >
         <button
           type="button"
-          onClick={() => go(-1)}
-          className="absolute left-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] sm:left-3 md:left-5"
+          onClick={goPrev}
+          disabled={n <= 1}
+          className="absolute left-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] disabled:pointer-events-none disabled:opacity-30 sm:left-3 md:left-5"
           aria-label="上一张"
         >
           <span className="text-2xl leading-none">‹</span>
         </button>
         <button
           type="button"
-          onClick={() => go(1)}
-          className="absolute right-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] sm:right-3 md:right-5"
+          onClick={goNext}
+          disabled={n <= 1}
+          className="absolute right-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] disabled:pointer-events-none disabled:opacity-30 sm:right-3 md:right-5"
           aria-label="下一张"
         >
           <span className="text-2xl leading-none">›</span>
         </button>
 
-        {/*
-          宽度：单张不超过 30vw，且均分剩余宽度（减去 gap），避免整页横向滚动条。
-          画幅：竖版 aspect 2/3（宽:高），即高度大于宽度。
-        */}
-        <div className="mx-auto flex w-full max-w-full items-center justify-center gap-2 px-14 py-2">
-          {slots.map(({ item, offset }, slotIndex) => {
-            const len = slots.length;
-            /** 仅当展示 5 张时：最左与最右两张模糊，中间三张清晰 */
-            const isEdgeBlurred = len >= 5 && (slotIndex === 0 || slotIndex === len - 1);
-            const blurPx = isEdgeBlurred ? 12 : 0;
-            const centerIdx = (len - 1) / 2;
-            const distFromCenter = Math.abs(slotIndex - centerIdx);
-            const scale =
-              len >= 5
-                ? isEdgeBlurred
-                  ? 0.88
-                  : distFromCenter <= 1
-                    ? 1
-                    : 0.95
-                : 1;
-            const opacity = isEdgeBlurred ? 0.52 : distFromCenter <= 1 ? 1 : 0.88;
-            const layoutId =
-              lightboxId === item.id ? undefined : `photo-${item.id}`;
+        <div className="px-14 py-2">
+          <motion.div
+            ref={trackRef}
+            className="flex will-change-transform"
+            style={{
+              x,
+              columnGap: TRACK_GAP_PX,
+            }}
+          >
+            {extended.map((item, i) => {
+              const dist = Math.abs(i - physicalCenter);
+              const isEdgeBlurred = n >= 5 && dist >= 2;
+              const blurPx = isEdgeBlurred ? 12 : 0;
+              const scale =
+                n >= 5
+                  ? isEdgeBlurred
+                    ? 0.88
+                    : dist <= 1
+                      ? 1
+                      : 0.95
+                  : 1;
+              const opacity = isEdgeBlurred
+                ? 0.52
+                : dist <= 1
+                  ? 1
+                  : 0.88;
 
-            /** 与容器 `gap-2`（0.5rem）一致，保证 N 张卡片 + (N-1) 道缝刚好占满 100% */
-            const cardWidth = `min(30vw, calc((100% - ${(len - 1) * 0.5}rem) / ${len}))`;
+              const useLayout =
+                !isSlideAnimating &&
+                i === physicalCenter &&
+                lightboxId !== item.id;
 
-            return (
-              <motion.button
-                key={`${item.id}-${offset}`}
-                type="button"
-                layoutId={layoutId}
-                onClick={() => setLightboxId(item.id)}
-                className="group relative aspect-[2/3] shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/20 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ffff]/70"
-                style={{
-                  filter: blurPx > 0 ? `blur(${blurPx}px)` : undefined,
-                  width: cardWidth,
-                }}
-                animate={{ scale, opacity }}
-                whileHover={{
-                  scale: scale * 1.02,
-                  transition: { duration: 0.2 },
-                }}
-                whileTap={{ scale: scale * 0.98 }}
-                transition={{ type: "spring", stiffness: 380, damping: 28 }}
-              >
-                <div className="h-full w-full overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageSrc}
-                    alt={item.titleZh}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100">
-                  <div className="absolute inset-0 rounded-2xl ring-1 ring-[#00ffff]/35" />
-                  <div className="absolute inset-0 bg-[radial-gradient(500px_200px_at_20%_0%,rgba(0,255,255,0.22),transparent_55%),radial-gradient(500px_200px_at_100%_100%,rgba(57,255,20,0.18),transparent_55%)]" />
-                </div>
-              </motion.button>
-            );
-          })}
+              return (
+                <motion.button
+                  key={`${item.id}-track-${i}`}
+                  layoutId={useLayout ? `photo-${item.id}` : undefined}
+                  type="button"
+                  onClick={() => setLightboxId(item.id)}
+                  className="group relative aspect-[2/3] shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/20 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ffff]/70"
+                  style={{
+                    filter: blurPx > 0 ? `blur(${blurPx}px)` : undefined,
+                    width:
+                      cardWidthPx != null
+                        ? cardWidthPx
+                        : "min(30vw, calc((100% - 96px) / 5))",
+                    /** 100% 相对视口容器；96px ≈ 4×24px gap 的降级估算，测量完成后改为精确像素宽 */
+                  }}
+                  animate={{ scale, opacity }}
+                  whileHover={{
+                    scale: scale * 1.02,
+                    transition: { duration: 0.2 },
+                  }}
+                  whileTap={{ scale: scale * 0.98 }}
+                  transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                >
+                  <div className="h-full w-full overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageSrc}
+                      alt={item.titleZh}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100">
+                    <div className="absolute inset-0 rounded-2xl ring-1 ring-[#00ffff]/35" />
+                    <div className="absolute inset-0 bg-[radial-gradient(500px_200px_at_20%_0%,rgba(0,255,255,0.22),transparent_55%),radial-gradient(500px_200px_at_100%_100%,rgba(57,255,20,0.18),transparent_55%)]" />
+                  </div>
+                </motion.button>
+              );
+            })}
+          </motion.div>
         </div>
       </div>
 

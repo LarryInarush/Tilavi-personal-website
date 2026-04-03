@@ -4,7 +4,7 @@
 
 ## 1. 项目目标（你当前实现了什么）
 
-- 个人主页（`/`）：自我介绍 + 电影通栏 + 摄影横向陈列（视口全宽、中间三张清晰）+ 兴趣板块 + 最新文章（读取本地 Markdown）。
+- 个人主页（`/`）：自我介绍 + 电影通栏 + 摄影横向陈列（视口全宽、中间三张清晰；箭头切换时为**整条轨道平移**的轮播，卡片间距约 24px）+ 兴趣板块 + 最新文章（读取本地 Markdown）。
 - 文章系统：
   - 文章列表页（`/posts`）
   - 文章详情页（`/posts/[slug]`）
@@ -42,7 +42,7 @@ site/
       HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；承载品牌/双语介绍）
       HomeMoviesPosterWallSection.tsx # 首页电影海报墙栏目（9 张预览，标题跳转 `/movies`）
       HomePhotographySection.tsx      # 首页摄影作品栏目（占位图来自电影海报，数据源见 `lib/photography.ts`）
-      PhotographyCarouselClient.tsx   # 摄影横向轮播：全宽通栏、约 4× 行高、中间三张清晰/仅最外侧模糊、箭头、全屏（layoutId）、标题滚动入场
+      PhotographyCarouselClient.tsx   # 摄影横向轮播：三倍条目轨道 + translateX 平移（循环无缝）、卡片间距 24px、中间三张清晰/仅最外侧模糊、全屏（仅居中卡挂 layoutId）、标题滚动入场
       TheTilaviSiteHeader.tsx # 站点 Header（叠加在 Hero 上的极简导航层）
       TheTilaviLogoMark.tsx   # TheTilavi Logo SVG mark（霓虹/酸性风格）
       posts/
@@ -125,4 +125,10 @@ tags: ["摄影", "滑板"]  # tags 可选
 
 ## 8. 补充文档（给接手开发者快速扫一眼）
 - `TECH_STACK_AND_DEPLOYMENT.md`：汇总当前技术栈、前后端职责、部署准备、评论规划（Giscus 方向）、以及工程准则说明。
+
+## 9. 开发变更记录（最近）
+- **2026-04-03**：摄影轮播交互优化（`PhotographyCarouselClient.tsx`）
+  - 左右箭头：由「重排 slot + 易触发的逐项入场感」改为 **`motion`/`framer-motion` 的 `animate` 驱动整条轨道 `x` 平移**；条目在 DOM 中为三倍拼接，首尾循环时在边界多走一步后**无动画跳回**中间段，避免整圈闪跳。
+  - 视觉：卡片间距由约 `gap-2` 调整为 **`TRACK_GAP_PX = 24`**；`layoutId` 仅在当前**物理居中**的一张上启用，避免三倍轨道上重复 `layoutId`。
+  - 目录结构未新增文件，职责仍见上文 `PhotographyCarouselClient.tsx` 条目。
 
