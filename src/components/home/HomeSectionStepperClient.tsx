@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomeSectionStepperClient.tsx`
+ * File: `src/components/home/HomeSectionStepperClient.tsx`
  * Purpose:
  * - 首页「步骤条式」区块导航：非传统下拉菜单，以竖/横向节点 + 连线表达顺序；点击平滑滚动到对应 `id`。
  * - 随滚动高亮当前大致所在区块（`scroll` + `offsetTop` 估算）。

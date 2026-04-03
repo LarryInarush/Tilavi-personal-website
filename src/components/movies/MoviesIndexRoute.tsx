@@ -1,5 +1,5 @@
 /**
- * File: `src/app/movies/MoviesIndexRoute.tsx`
+ * File: `src/components/movies/MoviesIndexRoute.tsx`
  * Purpose:
  * - `/movies` 页面的主要实现（Server Component）。
  *
@@ -42,7 +42,7 @@ export default async function MoviesIndexRoute({
   ]);
 
   return (
-    <main className="relative mx-auto w-full max-w-5xl px-6 py-14">
+    <main className="relative mx-auto w-full max-w-7xl px-6 py-14">
       {/* 背景氛围层：随机挑选一张海报“塞进”霓虹暗背景里 */}
       <MoviesBackgroundBackdrop movies={catalog} />
 

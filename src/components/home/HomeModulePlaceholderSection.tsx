@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomeModulePlaceholderSection.tsx`
+ * File: `src/components/home/HomeModulePlaceholderSection.tsx`
  * Purpose:
  * - 首页「未来模块」占位：宽版、加高区块 + 大号标题文案，便于先定版心与锚点，后续再替换为真实内容。
  * - 由 `HomeLandingRoute` 挂载；`id` 与 `HomeSectionStepperClient` 中的步骤一一对应。

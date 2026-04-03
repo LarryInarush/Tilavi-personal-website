@@ -1,5 +1,5 @@
 /**
- * File: `src/app/TheTilaviSiteHeader.tsx`
+ * File: `src/components/layout/TheTilaviSiteHeader.tsx`
  * Purpose:
  * - 首页顶部 Header（叠加在 Hero 上的导航/快捷入口层）。
  *

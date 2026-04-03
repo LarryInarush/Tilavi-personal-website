@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/** 摄影区块标题：偏编辑/展览气质的衬线体，供 `PhotographyCarouselClient` 使用 */
+/** 摄影区块标题：偏编辑/展览气质的衬线体，供 `PhotographyCarouselClient`（`src/components/home/`）使用 */
 const photoDisplay = Cormorant_Garamond({
   variable: "--font-photo-display",
   subsets: ["latin"],

@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomeMoviesPosterWallSection.tsx`
+ * File: `src/components/home/HomeMoviesPosterWallSection.tsx`
  * Purpose:
  * - 首页中的“电影海报墙”栏目（预览版：固定展示 9 张）。
  *
@@ -9,7 +9,7 @@
  * - 具体交互（滚动入场、hover、点击弹出详情卡片）由 client 组件负责
  */
 
-import MoviePosterWallClient from "./movies/MoviePosterWallClient";
+import MoviePosterWallClient from "@/components/movies/MoviePosterWallClient";
 import { getHomeMoviePosters } from "@/lib/movies";
 
 export default async function HomeMoviesPosterWallSection() {

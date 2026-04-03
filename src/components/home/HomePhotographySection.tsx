@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomePhotographySection.tsx`
+ * File: `src/components/home/HomePhotographySection.tsx`
  * Purpose:
  * - 首页「摄影作品」栏目：服务端取数后交给 `PhotographyCarouselClient` 渲染。
  */

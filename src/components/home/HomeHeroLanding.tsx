@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomeHeroLanding.tsx`
+ * File: `src/components/home/HomeHeroLanding.tsx`
  * Purpose:
  * - 首页顶部“英雄区（Hero）”的动效实现（方案 C：切片式纯视觉动效）。
  *
@@ -18,7 +18,7 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import TheTilaviLogoMark from "./TheTilaviLogoMark";
+import TheTilaviLogoMark from "@/components/layout/TheTilaviLogoMark";
 
 const HERO_IMAGE_SRC = "/hero/hero-bg-01.jpg";
 

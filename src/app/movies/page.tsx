@@ -2,11 +2,11 @@
  * `/movies` 路由入口（Next.js App Router 强制文件名）。
  *
  * 说明：
- * - 入口保持极薄：主要实现放在 `MoviesIndexRoute.tsx`
+ * - 入口保持极薄：主要实现放在 `src/components/movies/MoviesIndexRoute.tsx`
  * - 支持 `?page=` 查询参数分页
  */
 
-import MoviesIndexRoute from "./MoviesIndexRoute";
+import MoviesIndexRoute from "@/components/movies/MoviesIndexRoute";
 
 export default async function MoviesPage({
   searchParams,

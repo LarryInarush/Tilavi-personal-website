@@ -1,9 +1,10 @@
 /**
- * File: `src/app/PhotographyCarouselClient.tsx`
+ * File: `src/components/home/PhotographyCarouselClient.tsx`
  * Purpose:
  * - 首页「摄影作品」横向陈列：竖版画幅（高大于宽）；每张宽度不超过视口约 30% 且一行约五张落在视口内；
  *   中间三张清晰、仅最外侧卡片模糊；左右箭头切换时整条轨道平移（轮播），避免逐项从左侧滑入；
  * - 卡片 hover 霓虹风格反馈；点击后全屏查看，使用 `layoutId` 做共享元素过渡（仅当前居中张启用 layoutId，避免重复 id）。
+ * - 左右箭头在 `xl+` 时对称向内侧偏移，避免与首页右侧步骤条导航重叠。
  * - 标题使用全站注入的 `--font-photo-display`（Cormorant Garamond），滚动入场动画。
  */
 
@@ -214,7 +215,7 @@ export default function PhotographyCarouselClient({
           type="button"
           onClick={goPrev}
           disabled={n <= 1}
-          className="absolute left-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] disabled:pointer-events-none disabled:opacity-30 sm:left-3 md:left-5"
+          className="absolute left-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] disabled:pointer-events-none disabled:opacity-30 sm:left-3 md:left-5 xl:left-28 2xl:left-32"
           aria-label="上一张"
         >
           <span className="text-2xl leading-none">‹</span>
@@ -223,7 +224,7 @@ export default function PhotographyCarouselClient({
           type="button"
           onClick={goNext}
           disabled={n <= 1}
-          className="absolute right-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] disabled:pointer-events-none disabled:opacity-30 sm:right-3 md:right-5"
+          className="absolute right-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] disabled:pointer-events-none disabled:opacity-30 sm:right-3 md:right-5 xl:right-28 2xl:right-32"
           aria-label="下一张"
         >
           <span className="text-2xl leading-none">›</span>

@@ -24,11 +24,12 @@
 - 发布文章（文章内容由本地 Markdown 维护）
 
 ### 1.2 当前已实现的主要页面/能力
-- `/`：主页
-  - 自我介绍（窄栏）、电影海报墙（较宽通栏）、摄影作品横向条（`w-screen` 通栏：中间三张清晰、最外侧模糊；高行高约 4× 原预览；Cormorant 标题 + 滚动入场）、**步骤条式锚点导航**（`HomeSectionStepperClient`：右栏步骤节点 + 底部横向入口，平滑滚动）、**五个未来模块占位**（`HomeModulePlaceholderSection`）、兴趣板块与最新文章（窄栏）
+- `/`：主页（UI 主要在 `src/components/home/`）
+  - 自我介绍（窄栏）、电影海报墙（**较密网格** 约 3～6 列响应式）、摄影作品横向条、`HomeSectionStepperClient` 锚点导航、五个 `HomeModulePlaceholderSection` 占位、兴趣板块与最新文章
   - 展示“最新文章”（从本地 Markdown 读取）
 - `/movies`
-  - 电影海报墙：支持 hover 动效、点击弹出详情卡片、并提供分页（`?page=`）
+  - 电影海报墙：hover、分页（`?page=`）、容器 `max-w-7xl`
+  - 详情（`src/components/movies/MoviePosterWallClient.tsx`）：**液态玻璃**；**自点击海报中心 scale 进出场**（`variants` + `custom` 记录 `getBoundingClientRect`）；`AnimatePresence` 下**遮罩与卡片均为独立 `motion` 子节点**，关闭时 **scale 收回**（不显式切父级 opacity 盖掉子级 exit）；左栏 `object-cover`；正文 `.movie-detail-scroll`
 - `/posts`
   - 文章列表页：读取所有 Markdown frontmatter，渲染列表卡片
 - `/posts/[slug]`
@@ -79,9 +80,9 @@ tags: ["摄影", "滑板"]
   - 当配置 `TMDB_API_KEY` 后，`getMoviesCatalog()` 会并行请求 `zh-CN`（`append_to_response=credits`）与 `en-US`，合并海报、中英文简介/tagline、片长、评分、上映日、国家、导演与主要演员等；任一步失败则单条回退本地数据
   - 海报 URL 仍优先 TMDB `w780`（失败回退 `public/movies/posters/`）
 - 摄影模块（占位）：
-  - `src/lib/photography.ts` 的 `getPhotographyItems()` 当前复用上述电影海报 URL；替换为真实作品时只需改该数据层
-  - UI：`PhotographyCarouselClient`；首页外层用 `HomeLandingRoute` 中 `left-1/2 -mx-[50vw] w-screen` 做视口全宽通栏
-  - 轮播实现要点（2026-04-03）：**三倍 `items` 横向轨道** + **`useMotionValue` + `framer-motion` 的 `animate()`** 只动画轨道的 `translateX`（左右切换时为整体平移，而非重挂载导致的「全员从左侧重新入场」）；`ResizeObserver` 随视口宽度重算单卡宽度（仍满足「约五张落入视口、单卡不超约 30vw」）；首尾衔接时先**动画到边界复本索引**再**瞬时对齐**回中间段索引；卡片间距常量 **`TRACK_GAP_PX = 24`**；全屏 `layoutId` 仅打在物理居中那张，避免三份重复条目上的 ID 冲突。
+  - 数据：`src/lib/photography.ts`（当前复用电影海报 URL）
+  - UI：`src/components/home/PhotographyCarouselClient.tsx`；首页在 `HomeLandingRoute` 用 `left-1/2 -mx-[50vw] w-screen` 做通栏
+  - 轮播：**三倍轨道** + `translateX` 平移；`TRACK_GAP_PX = 24`；`xl+` **左右箭头对称内收**，避免与步骤条重叠
 
 ### 2.3 Markdown 解析链路
 - frontmatter：`gray-matter`
@@ -103,25 +104,18 @@ tags: ["摄影", "滑板"]
 ## 4. 项目结构设计（目录与职责）
 项目根目录为 `site/`，关键目录如下：
 
-- `site/content/posts/*.md`
-  - 文章内容（frontmatter + Markdown 正文）
-- `site/src/lib/posts.ts`
-  - 文章数据层：读取文件、解析 frontmatter、渲染 Markdown -> HTML
-- `site/src/app/`
-  - 路由入口与业务组件拆分
+- `site/content/posts/*.md` — 文章
+- `site/src/lib/*.ts` — 文章 / 电影 / 摄影数据层
+- `site/src/app/` — **路由专用**：`page.tsx`、`layout.tsx`、`globals.css`、按 URL 拆分的薄入口
+- `site/src/components/` — 按区域划分的 UI：`home/`、`layout/`、`movies/`
 
 路由组织方式（当前约定）：
-- `/`：
-  - `src/app/page.tsx` 作为入口薄包装
-  - 主要 UI/数据读取在 `src/app/HomeLandingRoute.tsx`
-- `/posts`：
-  - `src/app/posts/page.tsx` 作为入口薄包装
-  - 主要实现 `src/app/posts/PostsIndexRoute.tsx`
-- `/posts/[slug]`：
-  - `src/app/posts/[slug]/page.tsx` 作为入口薄包装 + `generateStaticParams`
-  - 主要实现 `src/app/posts/[slug]/PostDetailsRoute.tsx`
+- `/`：`src/app/page.tsx` → `src/components/home/HomeLandingRoute.tsx`
+- `/movies`：`src/app/movies/page.tsx` → `src/components/movies/MoviesIndexRoute.tsx`
+- `/posts`：`src/app/posts/page.tsx` → `PostsIndexRoute.tsx`
+- `/posts/[slug]`：`src/app/posts/[slug]/page.tsx` → `PostDetailsRoute.tsx`
 
-结构细节以 `site/PROJECT_STRUCTURE.md` 为准（此文档是“总览版”，但当细节冲突时以结构文件为事实来源）。
+结构细节以 `site/PROJECT_STRUCTURE.md` §3 为准（冲突时以该树为准）。
 
 ## 5. 部署方案（准备部署到哪里）
 本项目部署分两条路线：推荐路线（Vercel）与自建路线（云服务器）。
@@ -228,10 +222,11 @@ TMDB_API_KEY=你的_tmdb_api_key
 执行策略（与当前约定一致）：
 - 只有当“结构/职责分工发生变化”才更新 `PROJECT_STRUCTURE.md`
 - 若涉及重构、拆分、合并、移动文件等导致结构变化，也必须同步更新结构文档
+- **应直接改 §1 / §3 / §4 / §7 等已有段落与目录树**，不要仅在文末堆“变更日志”；维护规则写在 `PROJECT_STRUCTURE.md` 文首
 
 ## 9. 接手开发时的快速检查清单
 当你或其他工具/开发者准备扩展功能时，建议先确认：
-1. 你要改的是“内容层”（`content/posts`）还是“渲染层”（`src/app`）还是“数据层”（`src/lib`）
+1. 你要改的是“内容层”（`content/posts`）、“路由薄入口”（`src/app`）、“组件层”（`src/components`）还是“数据层”（`src/lib`）
 2. 新增文件是否需要遵循四条准则（文件头注释、关键逻辑注释、命名规范）
 3. 如果修改导致路由职责拆分/合并，是否需要更新 `site/PROJECT_STRUCTURE.md`
 4. 若使用了 `dangerouslySetInnerHTML`，未来是否会引入不可信输入（如果会，需要 sanitize）

@@ -1,5 +1,5 @@
 /**
- * File: `src/app/TheTilaviLogoMark.tsx`
+ * File: `src/components/layout/TheTilaviLogoMark.tsx`
  * Purpose:
  * - 提供站点品牌 `TheTilavi` 的 Logo Mark（可复用的 SVG 图形组件）。
  *

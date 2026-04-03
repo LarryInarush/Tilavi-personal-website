@@ -1,5 +1,5 @@
 /**
- * File: `src/app/HomeLandingRoute.tsx`
+ * File: `src/components/home/HomeLandingRoute.tsx`
  * Purpose:
  * - 提供 `/`（个人主页）的“主要渲染内容”。
  *
@@ -15,11 +15,12 @@
  * - 你随时可以改这里的文案、布局、最新文章数量等。
  * - 评论系统本轮不接入（你前面说先把页面搭起来）。
  * - 首页含步骤条式锚点导航（`HomeSectionStepperClient`）与未来模块占位（`HomeModulePlaceholderSection`），与各区块 `id` 一致。
+ * - 源文件位于 `src/components/home/`，由 `app/page.tsx` 导入。
  */
 import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
+import TheTilaviSiteHeader from "@/components/layout/TheTilaviSiteHeader";
 import HomeHeroLanding from "./HomeHeroLanding";
-import TheTilaviSiteHeader from "./TheTilaviSiteHeader";
 import HomeMoviesPosterWallSection from "./HomeMoviesPosterWallSection";
 import HomePhotographySection from "./HomePhotographySection";
 import HomeModulePlaceholderSection from "./HomeModulePlaceholderSection";

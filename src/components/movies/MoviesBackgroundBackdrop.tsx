@@ -1,5 +1,5 @@
 /**
- * File: `src/app/movies/MoviesBackgroundBackdrop.tsx`
+ * File: `src/components/movies/MoviesBackgroundBackdrop.tsx`
  * Purpose:
  * - `/movies` 页面专属的“背景氛围层”（Server Component）。
  *
