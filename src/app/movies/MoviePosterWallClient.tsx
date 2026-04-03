@@ -205,23 +205,29 @@ export default function MoviePosterWallClient({
 
             {/* 卡片 */}
             <motion.div
-              className="relative z-10 w-full max-w-3xl max-h-[min(88vh,920px)] overflow-hidden rounded-3xl border border-white/12 bg-[linear-gradient(180deg,rgba(5,6,8,0.92),rgba(5,6,8,0.72))] shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur"
+              className="relative z-10 w-full max-w-4xl max-h-[min(88vh,920px)] overflow-hidden rounded-3xl border border-white/12 bg-[linear-gradient(180deg,rgba(5,6,8,0.92),rgba(5,6,8,0.72))] shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur"
               initial={{ y: 22, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 22, opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="grid max-h-[min(88vh,920px)] gap-0 sm:grid-cols-[200px_1fr]">
-                <div className="hidden overflow-hidden border-b border-white/10 bg-black/20 sm:block sm:border-b-0 sm:border-r">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={activeMovie.posterSrc}
-                    alt={`${activeMovie.titleZh} poster`}
-                    className="h-full max-h-[min(88vh,920px)] w-full object-cover sm:min-h-[320px]"
-                  />
-                </div>
+              {/*
+                海报列使用 flex + object-contain：避免窄 grid 列（如 200px）+ object-cover 把竖版海报裁切或「夹扁」。
+                桌面端给足宽度与内边距，整张海报在侧栏内完整可见。
+              */}
+              <div className="flex max-h-[min(88vh,920px)] flex-col overflow-hidden sm:h-[min(88vh,920px)] sm:flex-row sm:items-stretch">
+                <aside className="flex shrink-0 flex-col items-center justify-center border-b border-white/10 bg-gradient-to-b from-black/45 to-black/25 px-4 py-6 sm:w-[min(42%,380px)] sm:max-w-[400px] sm:border-b-0 sm:border-r sm:border-white/10 sm:py-8">
+                  <div className="flex w-full max-w-[300px] items-center justify-center sm:max-h-[min(82vh,860px)] sm:max-w-[min(100%,360px)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={activeMovie.posterSrc}
+                      alt={`${activeMovie.titleZh} poster`}
+                      className="h-auto max-h-[min(70vh,720px)] w-full rounded-xl object-contain shadow-[0_20px_60px_rgba(0,0,0,0.5)] sm:rounded-2xl"
+                    />
+                  </div>
+                </aside>
 
-                <div className="flex min-h-0 min-w-0 flex-col">
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
                   <div className="shrink-0 border-b border-white/10 p-5 sm:hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img

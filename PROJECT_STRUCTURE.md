@@ -4,7 +4,7 @@
 
 ## 1. 项目目标（你当前实现了什么）
 
-- 个人主页（`/`）：自我介绍 + 电影通栏 + 摄影横向陈列（视口全宽、中间三张清晰；箭头切换时为**整条轨道平移**的轮播，卡片间距约 24px）+ 兴趣板块 + 最新文章（读取本地 Markdown）。
+- 个人主页（`/`）：自我介绍 + 电影通栏 + 摄影横向陈列（视口全宽、中间三张清晰；箭头切换时为**整条轨道平移**的轮播，卡片间距约 24px）+ **步骤条式页面导航**（点击平滑滚动至锚点）+ **五大未来模块占位**（旅行日记 / 书单 / 周杰伦时光机 / 留言版 / 想做与不想做）+ 兴趣板块 + 最新文章（读取本地 Markdown）。
 - 文章系统：
   - 文章列表页（`/posts`）
   - 文章详情页（`/posts/[slug]`）
@@ -38,7 +38,9 @@ site/
       globals.css              # Tailwind 入口 + 少量全局变量
       not-found.tsx            # 404 页面（Next.js App Router）
       page.tsx                 # 路由入口 `/`（极薄）
-      HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名）
+      HomeLandingRoute.tsx    # `/` 页面真正的 UI 与数据读取（语义化文件名；挂载锚点 id、占位模块与步骤条）
+      HomeSectionStepperClient.tsx # 首页 Client：步骤条式锚点导航（右栏竖向 / 底部横向），滚动高亮当前段
+      HomeModulePlaceholderSection.tsx # 首页未来模块占位：大号标题 + 宽/高区块，供旅行/书单等预留
       HomeHeroLanding.tsx     # 首页顶部 Hero（方案 C：照片切片 + 首次进入动效；承载品牌/双语介绍）
       HomeMoviesPosterWallSection.tsx # 首页电影海报墙栏目（9 张预览，标题跳转 `/movies`）
       HomePhotographySection.tsx      # 首页摄影作品栏目（占位图来自电影海报，数据源见 `lib/photography.ts`）
@@ -131,4 +133,9 @@ tags: ["摄影", "滑板"]  # tags 可选
   - 左右箭头：由「重排 slot + 易触发的逐项入场感」改为 **`motion`/`framer-motion` 的 `animate` 驱动整条轨道 `x` 平移**；条目在 DOM 中为三倍拼接，首尾循环时在边界多走一步后**无动画跳回**中间段，避免整圈闪跳。
   - 视觉：卡片间距由约 `gap-2` 调整为 **`TRACK_GAP_PX = 24`**；`layoutId` 仅在当前**物理居中**的一张上启用，避免三倍轨道上重复 `layoutId`。
   - 目录结构未新增文件，职责仍见上文 `PhotographyCarouselClient.tsx` 条目。
+- **2026-04-03（续）**：首页模块占位 + 步骤条导航 + 电影详情海报布局
+  - 新增 `HomeSectionStepperClient.tsx`：`HOME_PAGE_STEPS` 与 `section-intro` / `section-movies` / `section-photography` / `module-*` / `interests` / `section-posts` 对齐；点击 `scrollTo` 平滑滚动；`scroll` 监听高亮当前段；`xl+` 右侧竖向节点连线，小屏底部横向胶囊列表；`main` 增加 `pb-28` 避免遮挡底部导航。
+  - 新增 `HomeModulePlaceholderSection.tsx`：五个宽版加高占位区（旅行日记、看过的书、周杰伦时光机、留言版、想做的事·不想做的事）。
+  - `HomeLandingRoute.tsx`：为上述区块挂载 `id` 与 `scroll-mt-*`。
+  - `movies/MoviePosterWallClient.tsx`：详情弹窗左侧由 **窄 grid + `object-cover`** 改为 **flex 侧栏 + `object-contain` + 更大 `max-w`**，避免竖版海报被裁切或挤压。
 

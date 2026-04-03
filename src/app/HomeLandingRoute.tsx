@@ -14,6 +14,7 @@
  * 注意：
  * - 你随时可以改这里的文案、布局、最新文章数量等。
  * - 评论系统本轮不接入（你前面说先把页面搭起来）。
+ * - 首页含步骤条式锚点导航（`HomeSectionStepperClient`）与未来模块占位（`HomeModulePlaceholderSection`），与各区块 `id` 一致。
  */
 import Link from "next/link";
 import { getAllPosts } from "@/lib/posts";
@@ -21,6 +22,8 @@ import HomeHeroLanding from "./HomeHeroLanding";
 import TheTilaviSiteHeader from "./TheTilaviSiteHeader";
 import HomeMoviesPosterWallSection from "./HomeMoviesPosterWallSection";
 import HomePhotographySection from "./HomePhotographySection";
+import HomeModulePlaceholderSection from "./HomeModulePlaceholderSection";
+import HomeSectionStepperClient from "./HomeSectionStepperClient";
 
 /**
  * Personal home page content (route component).
@@ -51,9 +54,15 @@ export default async function HomeLandingRoute() {
       </div>
 
       {/* 页面主体：窄栏与通栏穿插，避免整页同一 max-width 显得呆板。 */}
-      <main className="w-full py-12">
+      <main className="w-full py-12 pb-28 xl:pb-12">
+        {/* 步骤条式区块导航（Client）：点击平滑滚动至各锚点 */}
+        <HomeSectionStepperClient />
+
         {/* 个人简介：保持阅读舒适的窄栏 */}
-        <div className="mx-auto w-full max-w-3xl px-6">
+        <div
+          id="section-intro"
+          className="mx-auto w-full max-w-3xl scroll-mt-28 px-6"
+        >
           <section className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.25)] backdrop-blur">
             <h1 className="text-4xl font-semibold tracking-tight text-zinc-50">
               你好，我是你
@@ -81,20 +90,55 @@ export default async function HomeLandingRoute() {
         </div>
 
         {/* 电影海报墙：通栏更宽，让画面有呼吸感 */}
-        <div className="mt-14 w-full border-y border-white/[0.06] bg-[radial-gradient(1200px_400px_at_50%_0%,rgba(57,255,20,0.06),transparent_55%)] py-12">
+        <div
+          id="section-movies"
+          className="mt-14 w-full scroll-mt-28 border-y border-white/[0.06] bg-[radial-gradient(1200px_400px_at_50%_0%,rgba(57,255,20,0.06),transparent_55%)] py-12"
+        >
           <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
             <HomeMoviesPosterWallSection />
           </div>
         </div>
 
         {/* 摄影作品：相对视口全宽通栏（突破父级宽度限制） */}
-        <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-x-hidden py-10">
+        <div
+          id="section-photography"
+          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] scroll-mt-28 overflow-x-hidden py-10"
+        >
           <HomePhotographySection />
         </div>
 
+        {/* 未来模块占位：旅行 / 书单 / 周杰伦 / 留言 / 想做 — 宽版 + 加高 */}
+        <div className="mx-auto mt-8 w-full max-w-6xl space-y-10 px-6 lg:px-10">
+          <HomeModulePlaceholderSection
+            id="module-travel"
+            title="旅行日记"
+            titleEn="Travel Journal"
+          />
+          <HomeModulePlaceholderSection
+            id="module-books"
+            title="看过的书"
+            titleEn="Books I’ve Read"
+          />
+          <HomeModulePlaceholderSection
+            id="module-jaychou"
+            title="周杰伦时光机"
+            titleEn="Jay Chou Time Machine"
+          />
+          <HomeModulePlaceholderSection
+            id="module-guestbook"
+            title="留言版"
+            titleEn="Guestbook"
+          />
+          <HomeModulePlaceholderSection
+            id="module-todos"
+            title="想做的事 · 不想做的事"
+            titleEn="Want to do · Rather not"
+          />
+        </div>
+
         {/* 兴趣板块 + 文章：回到窄栏 */}
-        <div className="mx-auto mt-6 w-full max-w-3xl px-6">
-          <section id="interests" className="mt-10">
+        <div className="mx-auto mt-16 w-full max-w-3xl px-6">
+          <section id="interests" className="scroll-mt-28 mt-10">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">
@@ -145,7 +189,7 @@ export default async function HomeLandingRoute() {
           </section>
 
           {/* 最新文章区块：展示最新 3 篇。 */}
-          <section className="mt-10">
+          <section id="section-posts" className="scroll-mt-28 mt-10">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">
