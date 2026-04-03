@@ -1,5 +1,5 @@
 /**
- * File: `src/components/home/HomeModulePlaceholderSection.tsx`
+ * File: `src/features/home/components/HomeModulePlaceholderSection.tsx`
  * Purpose:
  * - 首页「未来模块」占位：宽版、加高区块 + 大号标题文案，便于先定版心与锚点，后续再替换为真实内容。
  * - 由 `HomeLandingRoute` 挂载；`id` 与 `HomeSectionStepperClient` 中的步骤一一对应。
@@ -21,13 +21,13 @@ export default function HomeModulePlaceholderSection({
   return (
     <section
       id={id}
-      className="scroll-mt-28 rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(12,14,18,0.92),rgba(6,8,12,0.88))] px-8 py-20 shadow-[0_0_0_1px_rgba(0,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm md:px-14 md:py-28 min-h-[min(520px,85vw)] md:min-h-[560px]"
+      className="min-h-[min(520px,85vw)] scroll-mt-28 rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(12,14,18,0.92),rgba(6,8,12,0.88))] px-8 py-20 shadow-[0_0_0_1px_rgba(0,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm md:min-h-[560px] md:px-14 md:py-28"
     >
       <div className="mx-auto flex min-h-[min(320px,50vh)] max-w-4xl flex-col items-center justify-center text-center md:min-h-[360px]">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#39ff14]/75">
+        <p className="text-xs font-semibold tracking-[0.35em] text-[#39ff14]/75 uppercase">
           {kicker}
         </p>
-        <h2 className="font-photo-display mt-6 text-4xl font-medium italic leading-[1.1] tracking-[0.02em] text-zinc-50 sm:text-5xl md:text-6xl lg:text-7xl">
+        <h2 className="font-photo-display mt-6 text-4xl leading-[1.1] font-medium tracking-[0.02em] text-zinc-50 italic sm:text-5xl md:text-6xl lg:text-7xl">
           <span
             className="bg-[linear-gradient(92deg,#f4f4f5_0%,#a1a1aa_45%,#e4e4e7_100%)] bg-clip-text text-transparent"
             style={{

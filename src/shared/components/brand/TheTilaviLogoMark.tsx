@@ -1,5 +1,5 @@
 /**
- * File: `src/components/layout/TheTilaviLogoMark.tsx`
+ * File: `src/shared/components/brand/TheTilaviLogoMark.tsx`
  * Purpose:
  * - 提供站点品牌 `TheTilavi` 的 Logo Mark（可复用的 SVG 图形组件）。
  *
@@ -55,7 +55,6 @@ export default function TheTilaviLogoMark({
         </filter>
       </defs>
 
-      {/* 背板：深色圆角方形，减少“纯黑块”的廉价感 */}
       <rect
         x="6"
         y="6"
@@ -65,25 +64,23 @@ export default function TheTilaviLogoMark({
         fill="#050608"
         stroke="rgba(255,255,255,0.08)"
       />
-
-      {/* 斜切高光：酸性图形的“塑料感” */}
       <path
         d="M14 22C16 14 22 10 32 10C42 10 48 14 50 22"
         stroke="rgba(255,255,255,0.10)"
         strokeWidth="3"
         strokeLinecap="round"
       />
-
-      {/* TT：用几何线条构造，避免过细导致发光糊 */}
-      <g filter="url(#tt-glow)" stroke="url(#tt-neon)" strokeWidth="4.5" strokeLinecap="round">
-        {/* T (left) */}
+      <g
+        filter="url(#tt-glow)"
+        stroke="url(#tt-neon)"
+        strokeWidth="4.5"
+        strokeLinecap="round"
+      >
         <path d="M18 22H30" />
         <path d="M24 22V44" />
-        {/* T (right) */}
         <path d="M34 22H46" />
         <path d="M40 22V44" />
       </g>
     </svg>
   );
 }
-

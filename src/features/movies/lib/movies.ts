@@ -1,5 +1,5 @@
 /**
- * File: `src/lib/movies.ts`
+ * File: `src/features/movies/lib/movies.ts`
  * Purpose:
  * - 电影模块的数据层（movies content layer）。
  *
@@ -125,8 +125,7 @@ export const MOVIES: Movie[] = [
     posterSrc: "/movies/posters/whiplash.svg",
     taglineZh: "节奏、压迫、极限训练。",
     taglineEn: "Rhythm, pressure, obsession.",
-    notesZh:
-      "它像滑板练动作：重复、摔倒、再来。你能感受到“想变强”的痛与爽。",
+    notesZh: "它像滑板练动作：重复、摔倒、再来。你能感受到“想变强”的痛与爽。",
     notesEn:
       "It’s like drilling skate tricks: repetition, slams, and going again. You can feel the pain and thrill of getting better.",
     genres: ["Drama", "Music"],
@@ -170,8 +169,7 @@ export const MOVIES: Movie[] = [
     posterSrc: "/movies/posters/mad-max-fury-road.svg",
     taglineZh: "纯粹的速度与动线。",
     taglineEn: "Pure speed and motion lines.",
-    notesZh:
-      "极致动作设计，镜头语言非常清晰，像把“动线”刻在视网膜上。",
+    notesZh: "极致动作设计，镜头语言非常清晰，像把“动线”刻在视网膜上。",
     notesEn:
       "Peak action design with crystal-clear visual language—motion lines carved into your retina.",
     genres: ["Action", "Adventure"],
@@ -270,12 +268,10 @@ async function fetchTmdbMovieEnriched(tmdbId: number, apiKey: string) {
     .map((c) => c.name)
     .filter(Boolean);
 
-  const castTop = (zh.credits?.cast ?? [])
-    .slice(0, 12)
-    .map((c) => ({
-      name: c.name,
-      character: c.character || "—",
-    }));
+  const castTop = (zh.credits?.cast ?? []).slice(0, 12).map((c) => ({
+    name: c.name,
+    character: c.character || "—",
+  }));
 
   const countries = (zh.production_countries ?? [])
     .map((c) => c.name)
@@ -393,4 +389,3 @@ export async function getMoviesPage({
 export function getMovieById(id: string): Movie | null {
   return MOVIES.find((m) => m.id === id) ?? null;
 }
-

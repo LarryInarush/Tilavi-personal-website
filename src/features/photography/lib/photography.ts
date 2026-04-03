@@ -1,14 +1,14 @@
 /**
- * File: `src/lib/photography.ts`
+ * File: `src/features/photography/lib/photography.ts`
  * Purpose:
  * - 摄影作品模块的数据层：为首页横向陈列与全屏查看提供条目列表。
  *
  * 当前策略：
- * - 真实摄影作品尚未提供时，复用 `getMoviesCatalog()` 的海报 URL 作为占位图。
+ * - 真实摄影作品尚未提供时，复用电影模块的数据源作为占位图。
  * - 之后你只需改本文件的数据源（或改为读取 Markdown / CMS），UI 无需大改。
  */
 
-import { getMoviesCatalog } from "@/lib/movies";
+import { getMoviesCatalog } from "@/features/movies/lib/movies";
 
 export type PhotographyItem = {
   id: string;
@@ -30,10 +30,10 @@ const HOME_PHOTO_COUNT = 9;
  */
 export async function getPhotographyItems(): Promise<PhotographyItem[]> {
   const movies = await getMoviesCatalog();
-  return movies.slice(0, HOME_PHOTO_COUNT).map((m) => ({
-    id: `ph-${m.id}`,
-    titleZh: m.titleZh,
-    titleEn: m.titleEn,
-    imageSrc: m.posterSrc,
+  return movies.slice(0, HOME_PHOTO_COUNT).map((movie) => ({
+    id: `ph-${movie.id}`,
+    titleZh: movie.titleZh,
+    titleEn: movie.titleEn,
+    imageSrc: movie.posterSrc,
   }));
 }

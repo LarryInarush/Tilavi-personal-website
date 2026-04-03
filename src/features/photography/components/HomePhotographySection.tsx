@@ -1,11 +1,11 @@
 /**
- * File: `src/components/home/HomePhotographySection.tsx`
+ * File: `src/features/photography/components/HomePhotographySection.tsx`
  * Purpose:
  * - 首页「摄影作品」栏目：服务端取数后交给 `PhotographyCarouselClient` 渲染。
  */
 
+import { getPhotographyItems } from "@/features/photography/lib/photography";
 import PhotographyCarouselClient from "./PhotographyCarouselClient";
-import { getPhotographyItems } from "@/lib/photography";
 
 export default async function HomePhotographySection() {
   const items = await getPhotographyItems();

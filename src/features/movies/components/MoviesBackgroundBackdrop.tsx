@@ -1,5 +1,5 @@
 /**
- * File: `src/components/movies/MoviesBackgroundBackdrop.tsx`
+ * File: `src/features/movies/components/MoviesBackgroundBackdrop.tsx`
  * Purpose:
  * - `/movies` 页面专属的“背景氛围层”（Server Component）。
  *
@@ -14,7 +14,7 @@
  * - 只提供氛围，不抢正文内容
  */
 
-import type { Movie } from "@/lib/movies";
+import type { Movie } from "@/features/movies/lib/movies";
 
 function pickRandomPosterSrc(movies: Movie[]): string | null {
   if (!movies.length) return null;
@@ -32,7 +32,6 @@ export default function MoviesBackgroundBackdrop({
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      {/* 海报氛围层：blur + 低饱和 + 低对比，避免扎眼 */}
       <div
         className="absolute inset-0 scale-[1.06] bg-center"
         style={{
@@ -41,16 +40,12 @@ export default function MoviesBackgroundBackdrop({
           filter: "blur(34px) saturate(0.75) contrast(0.9)",
           opacity: 0.22,
           mixBlendMode: "screen",
-          animation: "moviesBackdropFadeIn 600ms cubic-bezier(0.22,1,0.36,1) both",
+          animation:
+            "moviesBackdropFadeIn 600ms cubic-bezier(0.22,1,0.36,1) both",
         }}
       />
-
-      {/* 暗化遮罩：把海报塞进“夜色” */}
       <div className="absolute inset-0 bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(0,0,0,0.25),transparent_60%),linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.75))]" />
-
-      {/* 霓虹点缀：与全站背景同语汇，保证统一 */}
       <div className="absolute inset-0 bg-[radial-gradient(900px_360px_at_18%_0%,rgba(57,255,20,0.10),transparent_60%),radial-gradient(900px_360px_at_82%_0%,rgba(0,255,255,0.08),transparent_60%),radial-gradient(900px_420px_at_70%_110%,rgba(191,0,255,0.07),transparent_62%)]" />
     </div>
   );
 }
-

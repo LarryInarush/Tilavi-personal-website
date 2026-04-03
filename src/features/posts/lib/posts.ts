@@ -1,5 +1,5 @@
 /**
- * File: `src/lib/posts.ts`
+ * File: `src/features/posts/lib/posts.ts`
  * Purpose:
  * - 这是“文章数据层 / content layer”的核心实现。
  *
@@ -186,4 +186,3 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     return null;
   }
 }
-

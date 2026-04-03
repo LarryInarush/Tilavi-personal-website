@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/** 摄影区块标题：偏编辑/展览气质的衬线体，供 `PhotographyCarouselClient`（`src/components/home/`）使用 */
+/** 摄影区块标题：偏编辑/展览气质的衬线体，供 `PhotographyCarouselClient`（`src/features/photography/components/`）使用 */
 const photoDisplay = Cormorant_Garamond({
   variable: "--font-photo-display",
   subsets: ["latin"],
@@ -47,7 +47,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${photoDisplay.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

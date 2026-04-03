@@ -1,5 +1,5 @@
 /**
- * File: `src/components/home/PhotographyCarouselClient.tsx`
+ * File: `src/features/photography/components/PhotographyCarouselClient.tsx`
  * Purpose:
  * - 首页「摄影作品」横向陈列：竖版画幅（高大于宽）；每张宽度不超过视口约 30% 且一行约五张落在视口内；
  *   中间三张清晰、仅最外侧卡片模糊；左右箭头切换时整条轨道平移（轮播），避免逐项从左侧滑入；
@@ -18,8 +18,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { AnimatePresence, animate, motion, useMotionValue } from "framer-motion";
-import type { PhotographyItem } from "@/lib/photography";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+} from "framer-motion";
+import type { PhotographyItem } from "@/features/photography/lib/photography";
 
 type Props = {
   items: PhotographyItem[];
@@ -61,12 +66,14 @@ export default function PhotographyCarouselClient({
   const x = useMotionValue(0);
   const animRef = useRef<ReturnType<typeof animate> | null>(null);
   /** 物理滑道索引：始终在三倍数组的中间一段 [n, 2n-1]，仅在绕圈时用动画衔接并重置 */
-  const [physicalCenter, setPhysicalCenter] = useState(() =>
-    Math.max(0, n),
-  );
+  const [physicalCenter, setPhysicalCenter] = useState(() => Math.max(0, n));
   const [measure, setMeasure] = useState<Measure | null>(null);
   const measureRef = useRef<Measure | null>(null);
-  measureRef.current = measure;
+
+  useEffect(() => {
+    measureRef.current = measure;
+  }, [measure]);
+
   /** 平移进行中时不给非居中副本挂 layoutId，避免 Framer 冲突 */
   const [isSlideAnimating, setIsSlideAnimating] = useState(false);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
@@ -77,9 +84,7 @@ export default function PhotographyCarouselClient({
     const vpW = vp.clientWidth;
     const cardW = computeCardW(vpW);
     setMeasure((prev) =>
-      prev && prev.vpW === vpW && prev.cardW === cardW
-        ? prev
-        : { vpW, cardW },
+      prev && prev.vpW === vpW && prev.cardW === cardW ? prev : { vpW, cardW },
     );
   }, []);
 
@@ -93,12 +98,6 @@ export default function PhotographyCarouselClient({
     if (el) ro.observe(el);
     return () => ro.disconnect();
   }, [remeasure]);
-
-  /** 条目数变化时回到中间段起点 */
-  useLayoutEffect(() => {
-    if (n <= 0) return;
-    setPhysicalCenter(n);
-  }, [n]);
 
   useLayoutEffect(() => {
     if (!measure || n <= 0) return;
@@ -163,7 +162,7 @@ export default function PhotographyCarouselClient({
   }, [measure, n, physicalCenter, runSlide, x]);
 
   const lightboxItem = lightboxId
-    ? items.find((x) => x.id === lightboxId) ?? null
+    ? (items.find((x) => x.id === lightboxId) ?? null)
     : null;
 
   if (n === 0) {
@@ -182,7 +181,7 @@ export default function PhotographyCarouselClient({
         transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
       >
         <h2
-          className="font-photo-display text-center text-4xl font-medium italic tracking-[0.02em] text-zinc-50 sm:text-5xl md:text-6xl lg:text-7xl"
+          className="font-photo-display text-center text-4xl font-medium tracking-[0.02em] text-zinc-50 italic sm:text-5xl md:text-6xl lg:text-7xl"
           style={{
             textShadow:
               "0 0 80px rgba(57,255,20,0.12), 0 0 120px rgba(0,255,255,0.08)",
@@ -215,7 +214,7 @@ export default function PhotographyCarouselClient({
           type="button"
           onClick={goPrev}
           disabled={n <= 1}
-          className="absolute left-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] disabled:pointer-events-none disabled:opacity-30 sm:left-3 md:left-5 xl:left-28 2xl:left-32"
+          className="absolute top-1/2 left-1 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#39ff14]/50 hover:bg-black/60 hover:text-[#39ff14] disabled:pointer-events-none disabled:opacity-30 sm:left-3 md:left-5 xl:left-28 2xl:left-32"
           aria-label="上一张"
         >
           <span className="text-2xl leading-none">‹</span>
@@ -224,7 +223,7 @@ export default function PhotographyCarouselClient({
           type="button"
           onClick={goNext}
           disabled={n <= 1}
-          className="absolute right-1 top-1/2 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] disabled:pointer-events-none disabled:opacity-30 sm:right-3 md:right-5 xl:right-28 2xl:right-32"
+          className="absolute top-1/2 right-1 z-20 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/50 text-zinc-100 shadow-lg backdrop-blur-md transition hover:border-[#00ffff]/50 hover:bg-black/60 hover:text-[#00ffff] disabled:pointer-events-none disabled:opacity-30 sm:right-3 md:right-5 xl:right-28 2xl:right-32"
           aria-label="下一张"
         >
           <span className="text-2xl leading-none">›</span>
@@ -244,18 +243,8 @@ export default function PhotographyCarouselClient({
               const isEdgeBlurred = n >= 5 && dist >= 2;
               const blurPx = isEdgeBlurred ? 12 : 0;
               const scale =
-                n >= 5
-                  ? isEdgeBlurred
-                    ? 0.88
-                    : dist <= 1
-                      ? 1
-                      : 0.95
-                  : 1;
-              const opacity = isEdgeBlurred
-                ? 0.52
-                : dist <= 1
-                  ? 1
-                  : 0.88;
+                n >= 5 ? (isEdgeBlurred ? 0.88 : dist <= 1 ? 1 : 0.95) : 1;
+              const opacity = isEdgeBlurred ? 0.52 : dist <= 1 ? 1 : 0.88;
 
               const useLayout =
                 !isSlideAnimating &&
@@ -325,7 +314,7 @@ export default function PhotographyCarouselClient({
               className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl border border-white/12 bg-zinc-950/90 shadow-[0_30px_120px_rgba(0,0,0,0.65)]"
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
             >
-              <div className="aspect-[2/3] w-full max-h-[min(85vh,900px)]">
+              <div className="aspect-[2/3] max-h-[min(85vh,900px)] w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={lightboxItem.imageSrc}

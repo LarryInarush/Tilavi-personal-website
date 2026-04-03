@@ -1,5 +1,5 @@
 /**
- * File: `src/components/layout/TheTilaviSiteHeader.tsx`
+ * File: `src/shared/components/layout/TheTilaviSiteHeader.tsx`
  * Purpose:
  * - 首页顶部 Header（叠加在 Hero 上的导航/快捷入口层）。
  *
@@ -14,7 +14,7 @@
  * - 右侧：导航按钮（文章）
  */
 import Link from "next/link";
-import TheTilaviLogoMark from "./TheTilaviLogoMark";
+import TheTilaviLogoMark from "@/shared/components/brand/TheTilaviLogoMark";
 
 export default function TheTilaviSiteHeader() {
   return (
@@ -41,9 +41,7 @@ export default function TheTilaviSiteHeader() {
         </nav>
       </div>
 
-      {/* 霓虹点缀线：一条就够，保持克制 */}
       <div className="mt-4 h-px w-full bg-[linear-gradient(90deg,transparent,rgba(57,255,20,0.70),rgba(0,255,255,0.45),rgba(191,0,255,0.35),transparent)]" />
     </header>
   );
 }
-

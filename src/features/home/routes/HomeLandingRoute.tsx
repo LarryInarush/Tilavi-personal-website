@@ -1,5 +1,5 @@
 /**
- * File: `src/components/home/HomeLandingRoute.tsx`
+ * File: `src/features/home/routes/HomeLandingRoute.tsx`
  * Purpose:
  * - 提供 `/`（个人主页）的“主要渲染内容”。
  *
@@ -8,23 +8,23 @@
  * - 但根路由入口文件应该尽量薄，因此把真正的 UI 和数据读取拆到这里。
  *
  * 数据来源：
- * - 调用 `getAllPosts()`（来自 `src/lib/posts.ts`）读取 `content/posts/*.md` 的元数据。
- * - 电影与摄影占位图：`getMoviesCatalog()` / `getPhotographyItems()`（见 `src/lib/movies.ts`、`photography.ts`）。
+ * - 调用 `getAllPosts()`（来自 `src/features/posts/lib/posts.ts`）读取 `content/posts/*.md` 的元数据。
+ * - 电影与摄影占位图来自各自功能区的数据层：`src/features/movies/lib/movies.ts` 与 `src/features/photography/lib/photography.ts`。
  *
  * 注意：
  * - 你随时可以改这里的文案、布局、最新文章数量等。
  * - 评论系统本轮不接入（你前面说先把页面搭起来）。
  * - 首页含步骤条式锚点导航（`HomeSectionStepperClient`）与未来模块占位（`HomeModulePlaceholderSection`），与各区块 `id` 一致。
- * - 源文件位于 `src/components/home/`，由 `app/page.tsx` 导入。
+ * - 源文件位于 `src/features/home/routes/`，由 `app/page.tsx` 导入。
  */
 import Link from "next/link";
-import { getAllPosts } from "@/lib/posts";
-import TheTilaviSiteHeader from "@/components/layout/TheTilaviSiteHeader";
-import HomeHeroLanding from "./HomeHeroLanding";
-import HomeMoviesPosterWallSection from "./HomeMoviesPosterWallSection";
-import HomePhotographySection from "./HomePhotographySection";
-import HomeModulePlaceholderSection from "./HomeModulePlaceholderSection";
-import HomeSectionStepperClient from "./HomeSectionStepperClient";
+import { getAllPosts } from "@/features/posts/lib/posts";
+import HomePhotographySection from "@/features/photography/components/HomePhotographySection";
+import TheTilaviSiteHeader from "@/shared/components/layout/TheTilaviSiteHeader";
+import HomeHeroLanding from "../components/HomeHeroLanding";
+import HomeModulePlaceholderSection from "../components/HomeModulePlaceholderSection";
+import HomeMoviesPosterWallSection from "../components/HomeMoviesPosterWallSection";
+import HomeSectionStepperClient from "../components/HomeSectionStepperClient";
 
 /**
  * Personal home page content (route component).
@@ -103,7 +103,7 @@ export default async function HomeLandingRoute() {
         {/* 摄影作品：相对视口全宽通栏（突破父级宽度限制） */}
         <div
           id="section-photography"
-          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] scroll-mt-28 overflow-x-hidden py-10"
+          className="relative right-1/2 left-1/2 -mx-[50vw] w-screen max-w-[100vw] scroll-mt-28 overflow-x-hidden py-10"
         >
           <HomePhotographySection />
         </div>
@@ -139,7 +139,7 @@ export default async function HomeLandingRoute() {
 
         {/* 兴趣板块 + 文章：回到窄栏 */}
         <div className="mx-auto mt-16 w-full max-w-3xl px-6">
-          <section id="interests" className="scroll-mt-28 mt-10">
+          <section id="interests" className="mt-10 scroll-mt-28">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">
@@ -154,9 +154,7 @@ export default async function HomeLandingRoute() {
             {/* 用 grid 做两列卡片；小屏自动堆叠。 */}
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
-                <h3 className="text-lg font-semibold text-zinc-50">
-                  摄影
-                </h3>
+                <h3 className="text-lg font-semibold text-zinc-50">摄影</h3>
                 <p className="mt-2 text-sm text-zinc-300">
                   构图、光线、后期与器材小结。
                 </p>
@@ -171,9 +169,7 @@ export default async function HomeLandingRoute() {
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur">
-                <h3 className="text-lg font-semibold text-zinc-50">
-                  滑板
-                </h3>
+                <h3 className="text-lg font-semibold text-zinc-50">滑板</h3>
                 <p className="mt-2 text-sm text-zinc-300">
                   训练进度、动作解析、摔跤复盘。
                 </p>
@@ -190,7 +186,7 @@ export default async function HomeLandingRoute() {
           </section>
 
           {/* 最新文章区块：展示最新 3 篇。 */}
-          <section id="section-posts" className="scroll-mt-28 mt-10">
+          <section id="section-posts" className="mt-10 scroll-mt-28">
             <div className="flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">
@@ -211,9 +207,7 @@ export default async function HomeLandingRoute() {
 
             <div className="mt-6 space-y-4">
               {latest.length === 0 ? (
-                <p className="text-sm text-zinc-300">
-                  暂无文章。
-                </p>
+                <p className="text-sm text-zinc-300">暂无文章。</p>
               ) : (
                 latest.map((post) => (
                   <article
@@ -250,4 +244,3 @@ export default async function HomeLandingRoute() {
     </div>
   );
 }
-
